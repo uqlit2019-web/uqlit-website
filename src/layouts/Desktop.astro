@@ -43,7 +43,9 @@ const footerLinks = [
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#EBC4C4" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -55,14 +57,24 @@ const footerLinks = [
       href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400..700&family=Kalam:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap"
     />
     {page === 'home' && (
-      // The splash (cursor opens the LIT app) plays once per browser session.
+      // The splash (cursor opens the LIT app) plays whenever Home loads,
+      // except when arriving at a section like /#sponsors. Any click or key skips it.
       <script is:inline>
-        try {
-          if (!sessionStorage.getItem('uqlit-splash')) {
-            document.documentElement.classList.add('splash');
-            sessionStorage.setItem('uqlit-splash', '1');
-          }
-        } catch (e) {}
+        if (!location.hash && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          var root = document.documentElement;
+          root.classList.add('splash');
+          var skip = function () {
+            root.classList.remove('splash');
+            removeEventListener('pointerdown', skip);
+            removeEventListener('keydown', skip);
+          };
+          addEventListener('pointerdown', skip);
+          addEventListener('keydown', skip);
+          setTimeout(function () { // intro has finished by now: stop listening, leave the page as it is
+            removeEventListener('pointerdown', skip);
+            removeEventListener('keydown', skip);
+          }, 4500);
+        }
       </script>
     )}
   </head>
@@ -156,6 +168,78 @@ const footerLinks = [
           window.scrollTo({ top: 0 });
         }
       });
+
+      // ---------- Desktop toys (from the original design) ----------
+      const desktop = document.querySelector('.desktop') as HTMLElement;
+      const calm = matchMedia('(prefers-reduced-motion: reduce)');
+      const SPARK = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.4-11-11C9.2 10.4 11.4 6.2 12 1z';
+      let toyId = 0;
+
+      // Sparkle trail behind the mouse (not on touch screens or with reduced motion)
+      let lastSpark = 0;
+      desktop.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse' || calm.matches) return;
+        const now = performance.now();
+        if (now - lastSpark < 70) return;
+        lastSpark = now;
+        const id = ++toyId;
+        const size = 10 + (id % 3) * 4;
+        const fill = ['#B8405F', '#D9708A', '#E8B04A'][id % 3];
+        const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        s.setAttribute('class', 'spark');
+        s.setAttribute('viewBox', '0 0 24 24');
+        s.setAttribute('aria-hidden', 'true');
+        s.style.cssText = `left:${e.clientX}px;top:${e.clientY}px;width:${size}px;height:${size}px`;
+        s.innerHTML = `<path fill="${fill}" d="${SPARK}"/>`;
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 760);
+      });
+
+      // Click the pink desktop (not the window) to drop a sticker; the last 10 stay
+      const stickers: HTMLElement[] = [];
+      const kinds = [
+        `<svg width="30" height="30" viewBox="0 0 24 24" fill="#B8405F"><path d="M12 21s-8.5-5.2-8.5-11.2A4.8 4.8 0 0 1 12 7a4.8 4.8 0 0 1 8.5 2.8C20.5 15.8 12 21 12 21z"/></svg>`,
+        `<img src="/assets/logo-lit.png" alt="" width="34" height="34">`,
+        `<svg width="30" height="30" viewBox="0 0 24 24" fill="#E8B04A"><path d="${SPARK}"/></svg>`,
+        `<span class="stick-tag">#women_in_stem</span>`,
+      ];
+      desktop.addEventListener('click', (e) => {
+        if (e.target !== desktop) return;
+        const r = desktop.getBoundingClientRect();
+        const id = ++toyId;
+        const k = id % 4;
+        const el = document.createElement('div');
+        el.className = k === 3 ? 'stick stick-wide' : 'stick';
+        el.setAttribute('aria-hidden', 'true');
+        el.style.cssText = `left:${e.clientX - r.left}px;top:${e.clientY - r.top}px;rotate:${((id * 37) % 40) - 20}deg`;
+        el.innerHTML = kinds[k];
+        desktop.appendChild(el);
+        stickers.push(el);
+        if (stickers.length > 10) stickers.shift()!.remove();
+      });
+
+      // Links like /#sponsors: the browser jumps while the window is still growing open,
+      // so it measures the shrunken window and lands in the wrong place. Work out the
+      // section's real position from the layout (transforms don't affect offsetTop) and go there.
+      function jumpToHash() {
+        const id = decodeURIComponent(location.hash.slice(1));
+        const target = id ? document.getElementById(id) : null;
+        if (!target) return;
+        let y = 0;
+        for (let n: HTMLElement | null = target; n; n = n.offsetParent as HTMLElement | null) y += n.offsetTop;
+        const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+        window.scrollTo({ top: y - margin, behavior: 'instant' });
+      }
+      if (location.hash) {
+        let userScrolled = false;
+        for (const ev of ['wheel', 'touchmove', 'keydown']) {
+          window.addEventListener(ev, () => (userScrolled = true), { once: true, passive: true });
+        }
+        const again = () => { if (!userScrolled) jumpToHash(); };
+        jumpToHash();
+        window.addEventListener('load', again, { once: true }); // after images/fonts settle
+        win.addEventListener('animationend', (e) => { if (e.target === win) again(); }); // after the window opens
+      }
     </script>
   </body>
 </html>
