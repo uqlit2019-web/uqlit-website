@@ -1,7 +1,7 @@
 ---
 import Desktop from '../../layouts/Desktop.astro';
 import MemberCard from '../../components/MemberCard.astro';
-import { t3, t6, execs } from '../../data/team';
+import { t3, t6, execs, initials } from '../../data/team';
 
 const t3Tilts = ['-2.5deg', '1.5deg', '-1deg'];
 const t6Tilts = ['2deg', '-2deg', '1deg'];
@@ -64,12 +64,9 @@ const boxColours = [
                   {m.photo ? (
                     <img class="avatar" src={m.photo} alt="" loading="lazy" />
                   ) : (
-                    <span class="avatar empty" aria-hidden="true">?</span>
+                    <span class="avatar empty" aria-hidden="true">{initials(m.name)}</span>
                   )}
-                  <span>
-                    <strong>{m.name}</strong>
-                    <span class="prole">{m.role}</span>
-                  </span>
+                  <strong class="pname">{m.name}</strong>
                 </li>
               ))}
             </ul>
@@ -124,6 +121,5 @@ const boxColours = [
     display: flex; align-items: center; justify-content: center;
     font-family: var(--f-sub); font-size: 24px; color: var(--rose);
   }
-  .person strong { display: block; font-size: 16px; }
-  .prole { font-size: 13px; color: var(--muted); }
+  .pname { font-size: 16px; }
 </style>
