@@ -18,6 +18,7 @@
   --f-sub: 'Instrument Serif', Georgia, serif;
   --f-body: 'Instrument Sans', system-ui, sans-serif;
   --f-hand: 'Belmonte Ballpoint', 'Kalam', cursive;
+  --f-mono: 'DM Mono', ui-monospace, monospace;
 
   --pad-x: clamp(24px, 5vw, 64px);
 }

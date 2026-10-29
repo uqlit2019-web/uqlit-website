@@ -23,6 +23,16 @@ const {
 const joinHref = RUBRIC_MEMBERSHIP_URL;
 // Position of this page's tile in the dock (LIT = 0), so the window opens out of it.
 const tileIndex = { home: 0, about: 1, team: 2, events: 3 }[page];
+
+// Footer links: every page except the one you're on, then Sponsors.
+const footerLinks = [
+  { key: 'home', label: 'Home', href: '/' },
+  { key: 'about', label: 'About', href: '/about/' },
+  { key: 'team', label: 'Team', href: '/team/' },
+  { key: 'events', label: 'Events', href: '/events/' },
+]
+  .filter((l) => l.key !== page)
+  .concat({ key: 'sponsors', label: 'Sponsors', href: page === 'home' ? '#sponsors' : '/#sponsors' });
 ---
 
 <!doctype html>
@@ -42,7 +52,7 @@ const tileIndex = { home: 0, about: 1, team: 2, events: 3 }[page];
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400..700&family=Kalam:wght@300;400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400..700&family=Kalam:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap"
     />
     {page === 'home' && (
       // The splash (cursor opens the LIT app) plays once per browser session.
@@ -81,9 +91,7 @@ const tileIndex = { home: 0, about: 1, team: 2, events: 3 }[page];
               <span><strong>UQ Ladies in Technology</strong><br />© {new Date().getFullYear()} UQLIT</span>
             </div>
             <div class="foot-links">
-              <a href="/about/">About</a>
-              <a href="/events/">Events</a>
-              <a href={page === 'home' ? '#sponsors' : '/#sponsors'}>Sponsors</a>
+              {footerLinks.map((l) => <a href={l.href}>{l.label}</a>)}
               <a href={joinHref} class="foot-join" target="_blank" rel="noopener">Join on Rubric ↗</a>
             </div>
           </footer>

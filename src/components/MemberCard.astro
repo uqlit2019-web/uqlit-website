@@ -1,0 +1,64 @@
+---
+import type { Member } from '../data/team';
+
+interface Props {
+  member: Member;
+  size?: 'lg' | 'md' | 'sm';
+  index?: number;
+  tilt?: string;
+  drop?: boolean; // nudge down for the scattered scrapbook look
+}
+
+const { member, size = 'sm', index = 0, tilt = '0deg', drop = false } = Astro.props;
+---
+
+<figure class:list={['member', size, 'rv', 'lift', 'taped', { drop, alt: size === 'sm' && index % 2 === 1 }]} style={`--d: ${index % 4}; rotate: ${tilt}`}>
+  {member.photo ? (
+    <img class="photo dev" src={member.photo} alt={member.name} loading="lazy" />
+  ) : (
+    <div class="photo empty" aria-hidden="true">?</div>
+  )}
+  <figcaption>
+    <div class="hand name">{member.name}</div>
+    <div class="role">{member.role}</div>
+  </figcaption>
+</figure>
+
+<style>
+  .member { margin: 0; position: relative; background: #fff; min-width: 0; }
+  .photo { display: block; width: 100%; object-fit: cover; }
+  .empty {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--blush-2); color: var(--rose);
+    font-family: var(--f-sub);
+  }
+  .alt .empty { background: #E3D6D6; color: var(--mauve); }
+  figcaption { text-align: center; }
+  .name { line-height: 1.1; }
+
+  .lg { flex: 1 1 260px; max-width: 320px; padding: 14px 14px 20px; box-shadow: 0 12px 30px rgba(90,50,60,.16); }
+  .lg .photo { height: 260px; font-size: 96px; }
+  .lg figcaption { padding-top: 14px; }
+  .lg .name { font-size: 24px; }
+  .lg .role {
+    margin-top: 6px; display: inline-block;
+    padding: 4px 12px; border-radius: 999px;
+    background: var(--rose); color: #fff;
+    font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .lg.drop { margin-top: 22px; }
+
+  .md { flex: 1 1 220px; max-width: 270px; padding: 12px 12px 18px; box-shadow: 0 10px 26px rgba(90,50,60,.14); }
+  .md .photo { height: 190px; font-size: 77px; }
+  .md figcaption { padding-top: 12px; }
+  .md .name { font-size: 21px; }
+  .md .role { margin-top: 4px; font-size: 13px; font-weight: 700; color: var(--rose); letter-spacing: .08em; text-transform: uppercase; }
+  .md.drop { margin-top: 16px; }
+
+  .sm { padding: 12px 12px 18px; box-shadow: 0 8px 24px rgba(90,50,60,.14); }
+  .sm .photo { height: 170px; font-size: 65px; }
+  .sm figcaption { padding-top: 12px; }
+  .sm .name { font-size: 20px; }
+  .sm .role { font-size: 13px; color: var(--muted); }
+  .sm.drop { margin-top: 14px; }
+</style>
