@@ -114,8 +114,8 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
     <div class="stats">
       {stats.map((s, i) => (
         <div class="stat rv lift taped" style={`--d: ${i}; background: ${s.bg}; rotate: ${s.tilt}`}>
-          <div class:list={['num', 'cnt', { shine: s.shine }]} style={`--from: ${s.from}; --to: ${s.to}; --suf: '${s.suf}'`} tabindex="0">
-            <span class="sr-only">{s.to}{s.suf}</span>
+          <div class:list={['num', 'cnt', { shine: s.shine }]} data-from={s.from} data-to={s.to} data-suf={s.suf} tabindex="0">
+            <span class="sr-only">{s.to}{s.suf}</span><span class="cnt-val" aria-hidden="true">{s.to}{s.suf}</span>
           </div>
           <div class="stat-label">{s.label}</div>
         </div>
@@ -172,18 +172,21 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
 
 <script>
   // Count-up stat stickers: run when each one scrolls into view; hovering replays it.
+  // The number is written as text (not a CSS counter) so every browser redraws it.
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const counters = document.querySelectorAll<HTMLElement>('.cnt');
   if (!calm && 'IntersectionObserver' in window) {
+    const show = (el: HTMLElement, n: number) => {
+      el.querySelector('.cnt-val')!.textContent = `${n}${el.dataset.suf ?? ''}`;
+    };
     const run = (el: HTMLElement) => {
-      const from = Number(getComputedStyle(el).getPropertyValue('--from')) || 0;
-      const to = Number(getComputedStyle(el).getPropertyValue('--to')) || 0;
+      const from = Number(el.dataset.from) || 0;
+      const to = Number(el.dataset.to) || 0;
       const start = performance.now();
       const dur = 1400;
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / dur);
-        const eased = 1 - Math.pow(1 - t, 3);
-        el.style.setProperty('--num', String(Math.round(from + (to - from) * eased)));
+        show(el, Math.round(from + (to - from) * (1 - Math.pow(1 - t, 3))));
         if (t < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
@@ -197,7 +200,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
       }
     }, { threshold: 0.6 });
     counters.forEach((el) => {
-      el.style.setProperty('--num', getComputedStyle(el).getPropertyValue('--from').trim() || '0');
+      show(el, Number(el.dataset.from) || 0);
       io.observe(el);
       el.addEventListener('mouseenter', () => run(el));
       el.addEventListener('focus', () => run(el));
