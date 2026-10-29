@@ -9,10 +9,10 @@ const tilt = (i: number) => `${((i % 3) - 1) * 0.6}deg`;
 
 const faves = [
   { src: '/assets/events/litgala20.jpg', alt: 'Members chatting in front of a WID banner at the LIT Gala', cap: 'LIT GALA', tilt: '-1.5deg' },
-  { src: '/assets/events/hfn2026.jpg', alt: 'Members talking with industry guests at High Frequency Networking 2026', cap: 'HIGH FREQUENCY NETWORKING', tilt: '1.5deg' },
+  { src: '/assets/events/hfn2026.jpg', alt: 'Members talking with industry guests at High Frequency Networking 2026', cap: 'HIGH FREQUENCY NETWORKING', tilt: '1.5deg', fall: true },
   { src: '/assets/events/paintnsip2.jpg', alt: 'Mini canvases, paints and bubble tea on the table at Paint and Sip', cap: 'PAINT AND SIP', tilt: '-1deg' },
   { src: '/assets/events/resumebuilding1.jpg', alt: 'A photographer taking professional headshots at Resume Building', cap: 'HEADSHOTS', tilt: '1deg' },
-  { src: '/assets/events/mockinterviews1.jpg', alt: 'A student in a one-on-one mock interview with an industry guest', cap: 'MOCK INTERVIEWS', tilt: '-2deg' },
+  { src: '/assets/events/mockinterviews1.jpg', alt: 'A student in a one-on-one mock interview with an industry guest', cap: 'MOCK INTERVIEWS', tilt: '-2deg', fall: true },
   { src: '/assets/events/launchpicnic5.jpg', alt: 'Two members by the Ladies in Technology banner at the launch picnic', cap: 'LAUNCH PICNIC', tilt: '1.5deg', pos: 'center 35%' },
 ];
 ---
@@ -105,7 +105,7 @@ const faves = [
     </div>
     <div class="faves">
       {faves.map((f, i) => (
-        <figure class="polaroid rv lift taped" style={`--d: ${i % 3}; rotate: ${f.tilt}`}>
+        <figure class:list={['polaroid', f.fall ? 'fall' : 'rv', 'lift', 'taped']} style={`--d: ${i % 3}; rotate: ${f.tilt}`}>
           <img src={f.src} alt={f.alt} loading="lazy" class="dev" style={f.pos ? `object-position: ${f.pos}` : undefined} />
           <figcaption class="hand">{f.cap}</figcaption>
         </figure>
@@ -262,13 +262,13 @@ const faves = [
   .today-btn {
     border: 0; padding: 4px 14px; border-radius: 999px;
     background: var(--blush-3); color: #8E2F48;
-    font: 700 13px/1.4 var(--f-body); cursor: pointer;
+    font: 700 13px/1.4 var(--f-body); cursor: var(--cursor-link);
     transition: background .2s, translate .2s;
   }
   .today-btn:hover, .today-btn:focus-visible { background: var(--blush-2); translate: 0 -1px; }
   .cal-head h2 { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(24px, 3vw, 36px); text-align: center; }
-  .nav { width: 44px; height: 44px; min-height: 0; padding: 0; justify-content: center; flex: none; border: 0; border-radius: 50%; background: var(--blush-3); color: var(--rose); font-size: 20px; cursor: pointer; }
-  .nav:disabled { opacity: .35; cursor: default; translate: none; box-shadow: none; }
+  .nav { width: 44px; height: 44px; min-height: 0; padding: 0; justify-content: center; flex: none; border: 0; border-radius: 50%; background: var(--blush-3); color: var(--rose); font-size: 20px; cursor: var(--cursor-link); }
+  .nav:disabled { opacity: .35; cursor: var(--cursor); translate: none; box-shadow: none; }
   .dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
   .dow { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
   @media (max-width: 420px) { .dow { font-size: 10px; letter-spacing: 0; } .dow, .grid { gap: 4px; } }
@@ -279,7 +279,7 @@ const faves = [
     border: 2px solid transparent; border-radius: 14px;
     background: var(--cream); color: var(--ink);
     font: 700 16px/1 var(--f-body);
-    cursor: pointer;
+    cursor: var(--cursor-link);
     transition: scale .2s, background .2s;
   }
   .grid :global(.day:hover), .grid :global(.day:focus-visible) { scale: 1.12; }

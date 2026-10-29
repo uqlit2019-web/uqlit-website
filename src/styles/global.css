@@ -21,6 +21,11 @@
   --f-mono: 'DM Mono', ui-monospace, monospace;
 
   --pad-x: clamp(24px, 5vw, 64px);
+
+  /* The splash-screen arrow as the site's cursor; rose version over anything clickable.
+     The tip of the arrow is at (5, 2). PNGs are fallbacks for browsers without SVG cursors. */
+  --cursor: url('/cursor.svg') 5 2, url('/cursor.png') 5 2, auto;
+  --cursor-link: url('/cursor-hover.svg') 5 2, url('/cursor-hover.png') 5 2, pointer;
 }
 
 /* ---------- Base ---------- */
@@ -34,6 +39,9 @@ body {
   background: var(--blush);
 }
 a { color: inherit; text-decoration: none; }
+html { cursor: var(--cursor); }
+a, button, [role='button'], summary, label[for] { cursor: var(--cursor-link); }
+button:disabled { cursor: var(--cursor); }
 img { max-width: 100%; }
 :focus-visible { outline: 2px solid var(--rose); outline-offset: 3px; }
 .sr-only {
@@ -124,6 +132,29 @@ img { max-width: 100%; }
   @keyframes dev { from { filter: grayscale(1) sepia(.3) blur(10px) brightness(1.35) contrast(.8); } to { filter: none; } }
 
   /* .flt (floating hero stickers) drift with scroll; moved by the layout script */
+
+  /* .fall: a few chosen polaroids drop in crooked, settle, then get taped down */
+  html.anim .fall:not(.in) { opacity: 0; }
+  html.anim .fall.in { animation: fall 1s cubic-bezier(.25,1.3,.5,1) both; animation-delay: calc(var(--d, 0) * 90ms); }
+  @keyframes fall { 0% { opacity: 0; transform: translateY(-90px) rotate(-9deg) scale(1.05); } 45% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+  html.anim .fall.taped:not(.in)::before { scale: 0 1; }
+  html.anim .fall.taped.in::before { transform-origin: left center; animation: tape .35s ease-out both; animation-delay: calc(var(--d, 0) * 90ms + .85s); }
+  @keyframes tape { from { scale: 0 1; opacity: .4; } to { scale: 1 1; opacity: 1; } }
+
+  /* .stamp: sponsor logos stamp down one by one */
+  html.anim .stamp:not(.in) { opacity: 0; }
+  html.anim .stamp.in { animation: stamp .55s cubic-bezier(.3,1.6,.5,1) both; animation-delay: calc(var(--d, 0) * 120ms); }
+  @keyframes stamp { 0% { opacity: 0; transform: scale(1.5) rotate(-6deg); } 60% { opacity: 1; transform: scale(.94); } 100% { opacity: 1; transform: none; } }
+  /* .sheen: a gold shimmer sweeps across featured sponsors once they land (and again on hover) */
+  html.anim .sheen.in::after { animation: sheen 1.1s ease-in-out both; animation-delay: calc(var(--d, 0) * 120ms + .6s); }
+  html.anim .sheen.in:hover::after { animation: sheen-again 1.1s ease-in-out both; }
+  @keyframes sheen { from { background-position: 100% 0; } to { background-position: 0 0; } }
+  @keyframes sheen-again { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+  /* .write: handwritten notes ink in letter by letter (letters are split by the layout script) */
+  html.anim .write:not(.in) .ch-w { opacity: 0; }
+  html.anim .write.in .ch-w { animation: ink .3s ease-out both; animation-delay: calc(var(--i) * 40ms + .15s); }
+  @keyframes ink { from { opacity: 0; filter: blur(2px); transform: translateY(3px); } }
 }
 
 /* ---------- Desktop toys: sparkle trail + click-to-drop stickers ---------- */
@@ -154,4 +185,14 @@ img { max-width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .spark { display: none; }
+}
+
+/* Pieces the scroll effects rely on (harmless when they're off) */
+.write .w { white-space: nowrap; }
+.write .ch-w { display: inline-block; }
+.sheen::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(232,176,74,.45) 47%, rgba(255,243,214,.8) 50%, rgba(232,176,74,.45) 53%, transparent 62%);
+  background-size: 300% 100%;
+  background-position: 0 0;
 }

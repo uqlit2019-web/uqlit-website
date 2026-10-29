@@ -67,7 +67,7 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
     </div>
 
     <div class="printer rv" style="--d: 2">
-      <div class="slot" aria-hidden="true"><div class="slot-gap"></div></div>
+      <img class="slot" src="/assets/printer.png" alt="" aria-hidden="true" width="600" height="81" />
       <div class="rcp" id="receipt">
         <div class="feed">
         <div class="receipt">
@@ -120,7 +120,7 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
         <img src="/assets/events/litgala18.jpg" alt="A speaker with a microphone talking to members at the LIT Gala" loading="lazy" class="dev" />
         <figcaption class="hand">LIT GALA</figcaption>
       </figure>
-      <figure class="polaroid rv lift taped" style="--d: 1; rotate: 1.5deg">
+      <figure class="polaroid fall lift taped" style="--d: 1; rotate: 1.5deg">
         <img src="/assets/events/hfn5.jpg" alt="A group of members dressed up at High Frequency Networking" loading="lazy" class="dev" />
         <figcaption class="hand">HIGH FREQUENCY NETWORKING</figcaption>
       </figure>
@@ -221,10 +221,12 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
   .story-copy p.deep { margin: 0; color: #4A3C3C; }
 
   .printer { flex: 1 1 300px; max-width: 380px; margin: 0 auto; min-width: 0; }
-  .slot { height: 26px; border-radius: 14px; background: linear-gradient(180deg, #8E7C7C, #5A4A4A); box-shadow: 0 6px 16px rgba(60,30,40,.3); position: relative; z-index: 2; }
-  .slot-gap { position: absolute; left: 14px; right: 14px; bottom: 5px; height: 6px; border-radius: 4px; background: #241A1A; }
-  /* .rcp clips at the printer slot; the padding leaves room for the shadow */
-  .rcp { margin: 0 -2px -30px; padding: 0 20px 30px; position: relative; z-index: 1; overflow: hidden; }
+  /* Pink printer: the paper slit is 49% of the way down the image and spans 7.5%–92% of its width */
+  .slot { display: block; width: 100%; height: auto; position: relative; z-index: 2; filter: drop-shadow(0 6px 10px rgba(120,60,80,.25)); }
+  /* .rcp starts exactly on the black slit and sits in front of the printer's lower lip,
+     so the paper feeds out of the line; it clips there so nothing shows above the slit.
+     Side padding keeps the receipt inside the slit; bottom padding leaves room for the shadow. */
+  .rcp { margin: -6.75% 0 -30px; padding: 0 10% 30px; position: relative; z-index: 3; overflow: hidden; }
   .feed { filter: drop-shadow(0 12px 14px rgba(90,50,60,.2)); }
   .receipt {
     background: #fff;

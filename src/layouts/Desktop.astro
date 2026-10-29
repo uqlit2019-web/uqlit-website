@@ -235,7 +235,22 @@ const footerLinks = [
             }
           }
         }, { rootMargin: '0px 0px -8% 0px' });
-        let pending = [...document.querySelectorAll<HTMLElement>('.rv, .dev, .grow')];
+        // Handwritten notes write themselves: split each into letters that ink in one by one.
+        // Screen readers get the plain text; the letters are hidden from them.
+        const escHtml = (t: string) => t.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+        document.querySelectorAll<HTMLElement>('.kicker, .join-kicker').forEach((el) => {
+          const text = el.textContent ?? '';
+          let i = 0;
+          const letters = text.split(/(\s+)/).map((part) =>
+            /^\s+$/.test(part)
+              ? part
+              : `<span class="w">${[...part].map((ch) => `<span class="ch-w" style="--i:${i++}">${escHtml(ch)}</span>`).join('')}</span>`,
+          ).join('');
+          el.innerHTML = `<span class="sr-only">${escHtml(text)}</span><span aria-hidden="true">${letters}</span>`;
+          el.classList.add('write');
+        });
+
+        let pending = [...document.querySelectorAll<HTMLElement>('.rv, .dev, .grow, .fall, .stamp, .write')];
         pending.forEach((el) => reveal.observe(el));
 
         // A fast jump (section link, End key) can skip right past an element without it ever
@@ -273,6 +288,41 @@ const footerLinks = [
           addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(drift); } }, { passive: true });
           drift();
         }
+
+        // Depth: the dotted pink desktop scrolls a little slower than the window
+        let bgQueued = false;
+        const desktopBg = () => {
+          bgQueued = false;
+          desktop.style.backgroundPositionY = `${(scrollY * 0.35).toFixed(1)}px`;
+        };
+        addEventListener('scroll', () => { if (!bgQueued) { bgQueued = true; requestAnimationFrame(desktopBg); } }, { passive: true });
+      }
+
+      // ---------- Home: the dock follows the section you're in ----------
+      // Upcoming events lights the Events tile, Sponsors lights the heart; otherwise LIT.
+      if (onHome) {
+        const spySections: [string, string][] = [['events', 'events'], ['sponsors', 'sponsors']];
+        const tiles = new Map([...document.querySelectorAll<HTMLElement>('.dock [data-tile]')].map((t) => [t.dataset.tile!, t]));
+        const dot = document.querySelector<HTMLElement>('#dock-lit .litdot');
+        let current = 'home';
+        let spyQueued = false;
+        const spy = () => {
+          spyQueued = false;
+          const line = innerHeight * 0.45;
+          let next = 'home';
+          for (const [id, tile] of spySections) {
+            const r = document.getElementById(id)?.getBoundingClientRect();
+            if (r && r.top <= line && r.bottom > line) next = tile;
+          }
+          if (next === current) return;
+          tiles.get(current)?.classList.replace('ga', 'gl');
+          const el = tiles.get(next);
+          el?.classList.replace('gl', 'ga');
+          if (el && dot) el.appendChild(dot);
+          current = next;
+        };
+        addEventListener('scroll', () => { if (!spyQueued) { spyQueued = true; requestAnimationFrame(spy); } }, { passive: true });
+        spy();
       }
 
       // Links like /#sponsors: the browser jumps while the window is still growing open,
@@ -378,7 +428,7 @@ const footerLinks = [
     position: relative;
     width: 14px; height: 14px; padding: 0;
     border: 0; border-radius: 50%;
-    cursor: pointer;
+    cursor: var(--cursor-link);
     display: flex; align-items: center; justify-content: center;
   }
   .tlb::before { content: ""; position: absolute; inset: -8px; }

@@ -15,7 +15,7 @@ const supTilt = ['1.5deg', '-2deg', '1deg', '-1.5deg', '-1deg', '2deg', '-1deg']
   <div class="tier rv"><span>Featured partners</span><span class="line"></span></div>
   <ul class="grid feat">
     {featured.map((s, i) => (
-      <li class="tile rv lift taped" style={`--d: ${i % 4}; rotate: ${featTilt[i % featTilt.length]}`}>
+      <li class="tile stamp sheen lift taped" style={`--d: ${i % 4}; rotate: ${featTilt[i % featTilt.length]}`}>
         <img src={s.logo} alt={s.name} style={`max-height: ${s.maxHeight}px`} loading="lazy" />
       </li>
     ))}
@@ -24,7 +24,7 @@ const supTilt = ['1.5deg', '-2deg', '1deg', '-1.5deg', '-1deg', '2deg', '-1deg']
   <div class="tier rv"><span>Supporting partners</span><span class="line"></span></div>
   <ul class="grid sup">
     {supporting.map((s, i) => (
-      <li class="tile rv lift" style={`--d: ${i % 4}; rotate: ${supTilt[i % supTilt.length]}`}>
+      <li class="tile stamp lift" style={`--d: ${i % 4}; rotate: ${supTilt[i % supTilt.length]}`}>
         <img src={s.logo} alt={s.name} style={`max-height: ${s.maxHeight}px`} loading="lazy" />
       </li>
     ))}
