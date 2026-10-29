@@ -91,8 +91,8 @@ img { max-width: 100%; }
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
-@property --num { syntax: '<integer>'; initial-value: 0; inherits: false; }
-.cnt { --num: var(--to, 0); counter-reset: n var(--num); }
+/* Count-up numbers: --num is animated by the page's script (see countUp on the home page) */
+.cnt { counter-reset: n var(--num, var(--to, 0)); }
 .cnt::after { content: counter(n) var(--suf, ''); }
 
 /* ---------- Animations (motion-safe only) ---------- */
@@ -123,12 +123,37 @@ img { max-width: 100%; }
     .grow { transform-origin: left; animation: grow linear both; animation-timeline: view(); animation-range: entry 10% entry 90%; }
     @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-    .cnt { animation: cnt linear both; animation-timeline: view(); animation-range: cover 8% cover 42%; }
-    @keyframes cnt { from { --num: var(--from, 0); } to { --num: var(--to, 0); } }
-    .cnt:hover, .cnt:focus-visible { animation: cntT 1.4s cubic-bezier(.2,.7,.2,1) both; animation-timeline: auto; }
-    @keyframes cntT { from { --num: var(--from, 0); } to { --num: var(--to, 0); } }
-
     .dev { animation: dev linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
     @keyframes dev { from { filter: grayscale(1) sepia(.3) blur(10px) brightness(1.35) contrast(.8); } to { filter: none; } }
   }
+}
+
+/* ---------- Desktop toys: sparkle trail + click-to-drop stickers ---------- */
+.spark {
+  position: fixed; z-index: 300;
+  pointer-events: none;
+  translate: -50% -50%;
+}
+.stick {
+  position: absolute; z-index: 20;
+  pointer-events: none;
+  min-width: 56px; height: 56px;
+  margin: -28px 0 0 -28px;
+  border-radius: 28px;
+  background: var(--cream);
+  border: 3px solid #fff;
+  box-shadow: 0 6px 14px rgba(90,50,60,.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.stick img { width: 34px; height: 34px; object-fit: contain; }
+.stick-wide { padding: 0 16px; }
+.stick-tag { font-family: var(--f-hand); font-weight: 700; font-size: 14px; color: var(--rose); white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .spark { animation: spk .75s ease-out both; }
+  @keyframes spk { from { opacity: 1; scale: 1; } to { opacity: 0; scale: .2; transform: translateY(18px) rotate(90deg); } }
+  .stick { animation: stk .45s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes stk { from { opacity: 0; scale: .2; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spark { display: none; }
 }

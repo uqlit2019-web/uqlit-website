@@ -1,15 +1,350 @@
 ---
 import Desktop from '../../layouts/Desktop.astro';
+import { allEvents, upcomingEvents, pastEvents, dateParts } from '../../data/events';
+import { RUBRIC_EVENTS_URL } from '../../data/site';
+
+const upcoming = upcomingEvents();
+const past = pastEvents();
+const tilt = (i: number) => `${((i % 3) - 1) * 0.6}deg`;
+
+const faves = [
+  { src: '/assets/events/litgala20.jpg', alt: 'Members chatting in front of a WID banner at the LIT Gala', cap: 'LIT GALA', tilt: '-1.5deg' },
+  { src: '/assets/events/hfn2026.jpg', alt: 'Members talking with industry guests at High Frequency Networking 2026', cap: 'HIGH FREQUENCY NETWORKING', tilt: '1.5deg' },
+  { src: '/assets/events/paintnsip2.jpg', alt: 'Mini canvases, paints and bubble tea on the table at Paint and Sip', cap: 'PAINT AND SIP', tilt: '-1deg' },
+  { src: '/assets/events/resumebuilding1.jpg', alt: 'A photographer taking professional headshots at Resume Building', cap: 'HEADSHOTS', tilt: '1deg' },
+  { src: '/assets/events/mockinterviews1.jpg', alt: 'A student in a one-on-one mock interview with an industry guest', cap: 'MOCK INTERVIEWS', tilt: '-2deg' },
+  { src: '/assets/events/launchpicnic5.jpg', alt: 'Two members by the Ladies in Technology banner at the launch picnic', cap: 'LAUNCH PICNIC', tilt: '1.5deg', pos: 'center 35%' },
+];
 ---
 
 <Desktop page="events" title="Events · UQLIT" windowTitle="Events">
-  <section class="placeholder">
-    <p class="hand pop" style="--d: 0">coming soon ♡</p>
-    <h1 class="h1 pop" style="--d: 1">What's on</h1>
+  <section class="intro">
+    <div class="hand hi pop" style="--d: 0">mark your calendar</div>
+    <h1 class="title pop" style="--d: 1">What's <em>on</em></h1>
+    <p class="pop" style="--d: 2">Pick a day to see what's happening. Bookings and tickets live on Rubric.</p>
   </section>
+
+  <!-- Calendar + selected day -->
+  <section class="cal-sec" id="calendar">
+    <div class="cal rv">
+      <div class="cal-head">
+        <button type="button" class="nav btn" id="cal-prev" aria-label="Previous month">←</button>
+        <div class="head-mid">
+          <h2 id="cal-label" aria-live="polite">&nbsp;</h2>
+          <button type="button" class="today-btn" id="cal-today">Today</button>
+        </div>
+        <button type="button" class="nav btn" id="cal-next" aria-label="Next month">→</button>
+      </div>
+      <div class="dow" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div class="grid" id="cal-grid"></div>
+      <div class="legend">
+        <span class="key"><span class="dot up" aria-hidden="true"></span>Coming up</span>
+        <span class="key"><span class="dot past" aria-hidden="true"></span>Past event</span>
+        <a class="chip" href={RUBRIC_EVENTS_URL} target="_blank" rel="noopener">Tickets on Rubric ↗</a>
+      </div>
+    </div>
+
+    <div class="note-col">
+      <div class="note" id="cal-note" aria-live="polite">
+        <div class="tape" aria-hidden="true"></div>
+        <div class="hand note-date" id="note-date">&nbsp;</div>
+        <div id="note-body">
+          <noscript><p>Turn on JavaScript to use the calendar, or see the lists below.</p></noscript>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coming up -->
+  <section class="list-sec tinted">
+    <div class="rv"><h2 class="h2 h2-sm">Coming up</h2></div>
+    <div class="rows" id="upcoming-rows">
+      {upcoming.map((e, i) => {
+        const d = dateParts(e.date);
+        return (
+          <a class="row rv lift" href="#calendar" data-pick={e.date} data-date={e.date} style={`rotate: ${tilt(i)}`}>
+            <span class="row-date">{d.day}<span>{d.mon}</span></span>
+            <span class="row-main"><strong>{e.title}</strong><span>{e.time} · {e.venue}</span></span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        );
+      })}
+    </div>
+    <p class="hand empty" id="upcoming-empty" hidden={upcoming.length > 0}>
+      nothing announced just yet. new events land on <a href={RUBRIC_EVENTS_URL} target="_blank" rel="noopener">Rubric</a> first ♡
+    </p>
+  </section>
+
+  <!-- Earlier this year -->
+  {past.length > 0 && (
+    <section class="list-sec">
+      <div class="rv">
+        <div class="hand kicker">the year so far</div>
+        <h2 class="h2 h2-sm">Earlier events</h2>
+      </div>
+      <div class="rows">
+        {past.map((e, i) => {
+          const d = dateParts(e.date);
+          return (
+            <a class="row past rv lift" href="#calendar" data-pick={e.date} style={`rotate: ${tilt(i)}`}>
+              <span class="row-date">{d.day}<span>{d.mon}</span></span>
+              <span class="row-main"><strong>{e.title}</strong><span>{e.time} · {e.venue}</span></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  )}
+
+  <!-- Past favourites -->
+  <section class="list-sec">
+    <div class="rv">
+      <div class="hand kicker">in case you missed them</div>
+      <h2 class="h2 h2-sm">Past favourites</h2>
+    </div>
+    <div class="faves">
+      {faves.map((f, i) => (
+        <figure class="polaroid rv lift taped" style={`--d: ${i % 3}; rotate: ${f.tilt}`}>
+          <img src={f.src} alt={f.alt} loading="lazy" class="dev" style={f.pos ? `object-position: ${f.pos}` : undefined} />
+          <figcaption class="hand">{f.cap}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <script type="application/json" id="events-data" set:html={JSON.stringify(allEvents())} />
 </Desktop>
 
+<script>
+  import type { UqlitEvent } from '../../data/events';
+
+  const events: UqlitEvent[] = JSON.parse(document.getElementById('events-data')!.textContent || '[]');
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Brisbane' }).format(new Date());
+
+  const byDate = new Map<string, UqlitEvent[]>();
+  for (const e of events) byDate.set(e.date, [...(byDate.get(e.date) ?? []), e]);
+
+  // Month keys are 'YYYY-MM'
+  const monthOf = (iso: string) => iso.slice(0, 7);
+  const addMonths = (key: string, n: number) => {
+    const [y, m] = key.split('-').map(Number);
+    const d = new Date(Date.UTC(y, m - 1 + n, 1));
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+  };
+  const fmt = (iso: string, o: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat('en-AU', { ...o, timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+
+  // Navigable range: earliest event (or this month) to a month past the latest event (or this month).
+  const dates = events.map((e) => e.date).sort();
+  const thisMonth = monthOf(today);
+  const minMonth = [monthOf(dates[0] ?? today), thisMonth].sort()[0];
+  const maxMonth = addMonths([monthOf(dates.at(-1) ?? today), thisMonth].sort()[1], 1);
+
+  // Open on today's date.
+  let selected = today;
+  let month = monthOf(today);
+
+  const grid = document.getElementById('cal-grid')!;
+  const label = document.getElementById('cal-label')!;
+  const prev = document.getElementById('cal-prev') as HTMLButtonElement;
+  const nextBtn = document.getElementById('cal-next') as HTMLButtonElement;
+  const todayBtn = document.getElementById('cal-today') as HTMLButtonElement;
+  const note = document.getElementById('cal-note')!;
+  const noteDate = document.getElementById('note-date')!;
+  const noteBody = document.getElementById('note-body')!;
+
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+  function renderGrid() {
+    const [y, m] = month.split('-').map(Number);
+    label.textContent = fmt(`${month}-01`, { month: 'long', year: 'numeric' });
+    prev.disabled = month <= minMonth;
+    nextBtn.disabled = month >= maxMonth;
+
+    const first = new Date(Date.UTC(y, m - 1, 1));
+    const lead = (first.getUTCDay() + 6) % 7; // Monday first
+    const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+
+    const cells: string[] = [];
+    for (let i = 0; i < lead; i++) cells.push('<span aria-hidden="true"></span>');
+    for (let n = 1; n <= days; n++) {
+      const iso = `${month}-${String(n).padStart(2, '0')}`;
+      const evs = byDate.get(iso);
+      const kind = evs ? (iso >= today ? 'up' : 'past') : '';
+      const name = fmt(iso, { weekday: 'long', day: 'numeric', month: 'long' });
+      const aria = evs ? `${name}: ${evs.map((e) => e.title).join(', ')}` : name;
+      cells.push(
+        `<button type="button" class="day ${kind} ${iso === today ? 'today' : ''}" data-day="${iso}" aria-pressed="${iso === selected}" aria-label="${esc(aria)}">${n}<span class="dot" aria-hidden="true"></span></button>`,
+      );
+    }
+    grid.innerHTML = cells.join('');
+  }
+
+  function renderNote() {
+    const evs = byDate.get(selected);
+    noteDate.textContent = fmt(selected, { weekday: 'long', day: 'numeric', month: 'long' });
+    if (!evs) {
+      noteBody.innerHTML = `<h3 class="none">Nothing planned</h3><p>Pick a day with a dot to see what's on.</p>`;
+    } else {
+      const isPast = selected < today;
+      noteBody.innerHTML = evs
+        .map(
+          (e) => `
+          ${e.image ? `<img class="note-photo" src="${esc(e.image)}" alt="" loading="lazy">` : ''}
+          ${isPast ? '<span class="been">been and gone ♡</span>' : ''}
+          <h3>${esc(e.title)}</h3>
+          <p>${esc(e.time)} · ${esc(e.venue)}${e.blurb ? `<br>${esc(e.blurb)}` : ''}</p>
+          ${e.rubricUrl ? `<a class="btn book" href="${esc(e.rubricUrl)}" target="_blank" rel="noopener">${isPast ? 'View on Rubric' : 'Book on Rubric'} <span aria-hidden="true">↗</span></a>` : ''}`,
+        )
+        .join('<hr>');
+    }
+    // replay the little "swap" animation
+    note.classList.remove('swap');
+    void note.offsetWidth;
+    note.classList.add('swap');
+  }
+
+  function select(iso: string) {
+    selected = iso;
+    month = monthOf(iso);
+    renderGrid();
+    renderNote();
+  }
+
+  grid.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-day]');
+    if (!btn) return;
+    selected = btn.dataset.day!;
+    grid.querySelectorAll('button[data-day]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    renderNote();
+  });
+  prev.addEventListener('click', () => { month = addMonths(month, -1); renderGrid(); });
+  nextBtn.addEventListener('click', () => { month = addMonths(month, 1); renderGrid(); });
+  todayBtn.addEventListener('click', () => select(today));
+
+  // List rows jump to that day on the calendar
+  document.querySelectorAll<HTMLAnchorElement>('a[data-pick]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      select(a.dataset.pick!);
+      document.getElementById('calendar')!.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }),
+  );
+
+  // The site is built ahead of time: drop "coming up" rows that have passed since the last build.
+  let shown = 0;
+  document.querySelectorAll<HTMLElement>('#upcoming-rows [data-date]').forEach((row) => {
+    const keep = row.dataset.date! >= today;
+    row.hidden = !keep;
+    if (keep) shown++;
+  });
+  document.getElementById('upcoming-empty')!.hidden = shown > 0;
+
+  renderGrid();
+  renderNote();
+</script>
+
 <style>
-  .placeholder { padding: clamp(48px, 8vw, 120px) var(--pad-x); min-height: 50vh; }
-  .placeholder .hand { margin: 0 0 18px; font-size: 23px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .intro { padding: clamp(32px, 5vw, 64px) var(--pad-x) clamp(16px, 2vw, 24px); }
+  .hi { font-size: 23px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .title { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(44px, 6vw, 84px); line-height: 1.02; letter-spacing: -0.01em; }
+  .title em { color: var(--rose); font-style: normal; }
+  .intro p { margin: 16px 0 0; max-width: 540px; font-size: 18px; line-height: 1.6; color: var(--muted); }
+  .kicker { font-size: 22px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .h2-sm { font-size: clamp(30px, 4vw, 44px); }
+
+  /* ---------- Calendar ---------- */
+  .cal-sec { display: flex; flex-wrap: wrap; gap: 36px 40px; align-items: flex-start; padding: clamp(16px, 3vw, 32px) var(--pad-x) clamp(40px, 5vw, 64px); scroll-margin-top: 40px; }
+  .cal { flex: 1.5 1 440px; min-width: 0; background: #fff; border-radius: 20px; padding: clamp(14px, 3vw, 28px); box-shadow: 0 12px 34px rgba(90,50,60,.14); }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .head-mid { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+  .today-btn {
+    border: 0; padding: 4px 14px; border-radius: 999px;
+    background: var(--blush-3); color: #8E2F48;
+    font: 700 13px/1.4 var(--f-body); cursor: pointer;
+    transition: background .2s, translate .2s;
+  }
+  .today-btn:hover, .today-btn:focus-visible { background: var(--blush-2); translate: 0 -1px; }
+  .cal-head h2 { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(24px, 3vw, 36px); text-align: center; }
+  .nav { width: 44px; height: 44px; min-height: 0; padding: 0; justify-content: center; flex: none; border: 0; border-radius: 50%; background: var(--blush-3); color: var(--rose); font-size: 20px; cursor: pointer; }
+  .nav:disabled { opacity: .35; cursor: default; translate: none; box-shadow: none; }
+  .dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .dow { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  @media (max-width: 420px) { .dow { font-size: 10px; letter-spacing: 0; } .dow, .grid { gap: 4px; } }
+
+  .grid :global(.day) {
+    position: relative;
+    aspect-ratio: 1 / 1; min-height: 40px;
+    border: 2px solid transparent; border-radius: 14px;
+    background: var(--cream); color: var(--ink);
+    font: 700 16px/1 var(--f-body);
+    cursor: pointer;
+    transition: scale .2s, background .2s;
+  }
+  .grid :global(.day:hover), .grid :global(.day:focus-visible) { scale: 1.12; }
+  .grid :global(.day.today) { border-color: rgba(120,106,106,.45); border-style: dashed; }
+  .grid :global(.day.up) { background: var(--blush-3); }
+  .grid :global(.day.past) { background: #F1EAEA; }
+  .grid :global(.day[aria-pressed='true']) { background: var(--rose); color: #fff; border: 2px solid #8E2F48; }
+  .grid :global(.dot) { position: absolute; bottom: 6px; left: 50%; margin-left: -3px; width: 6px; height: 6px; border-radius: 50%; }
+  .grid :global(.up .dot) { background: var(--rose); }
+  .grid :global(.past .dot) { background: var(--mauve); }
+  .grid :global(.day.up[aria-pressed='true'] .dot), .grid :global(.day.past[aria-pressed='true'] .dot) { background: #fff; }
+  @media (max-width: 420px) { .grid :global(.day) { border-radius: 10px; font-size: 14px; min-height: 0; } .grid :global(.dot) { bottom: 4px; width: 5px; height: 5px; } }
+
+  .legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 20px; font-size: 13px; color: var(--muted); }
+  .key { display: inline-flex; align-items: center; gap: 8px; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend .dot.up { background: var(--rose); }
+  .legend .dot.past { background: var(--mauve); }
+  .chip { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px; background: var(--blush-3); color: #8E2F48; font-weight: 700; }
+  .chip:hover { background: var(--blush-2); }
+
+  /* ---------- Selected-day note ---------- */
+  .note-col { flex: 1 1 300px; min-width: 0; padding-top: 14px; }
+  .note { position: relative; background: var(--blush-3); border-radius: 6px; padding: 38px 28px 30px; box-shadow: 0 12px 30px rgba(90,50,60,.16); rotate: 2deg; }
+  .tape { position: absolute; top: -12px; left: 50%; width: 80px; height: 24px; margin-left: -40px; background: rgba(217,112,138,.45); rotate: -3deg; border-radius: 2px; }
+  .note-date { font-size: 20px; color: var(--rose); }
+  .note :global(h3) { margin: 4px 0 8px; font-family: var(--f-sub); font-weight: 400; font-size: clamp(32px, 3.4vw, 41px); line-height: 1.1; }
+  .note :global(h3.none) { font-size: 36px; }
+  .note :global(p) { margin: 0 0 22px; line-height: 1.6; color: #4A3C3C; }
+  .note :global(.book) { min-height: 48px; padding: 0 24px; background: var(--rose); color: #fff; box-shadow: 0 5px 0 rgba(90,40,55,.25); }
+  .note :global(.been) { display: inline-block; margin-top: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.6); font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--muted); }
+  .note :global(.note-photo) { display: block; width: 100%; height: 170px; object-fit: cover; margin: 12px 0 10px; border: 6px solid #fff; box-shadow: 0 6px 16px rgba(90,50,60,.18); rotate: -1.5deg; }
+  .note :global(hr) { border: 0; border-top: 2px dashed rgba(184,64,95,.3); margin: 24px 0 18px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .note:global(.swap) { animation: swap .45s cubic-bezier(.2,.9,.3,1.2); }
+    @keyframes swap { from { opacity: 0; transform: translateY(14px) rotate(-3deg); } }
+  }
+
+  /* ---------- Lists ---------- */
+  .list-sec { padding: clamp(36px, 5vw, 64px) var(--pad-x) clamp(48px, 6vw, 80px); }
+  .list-sec.tinted { background: var(--tint); }
+  .rows { display: flex; flex-direction: column; gap: 14px; margin-top: 28px; }
+  .row { display: flex; align-items: center; gap: 20px; padding: 16px 22px; border-radius: 14px; background: #fff; box-shadow: 0 6px 18px rgba(90,50,60,.1); }
+  .row[hidden] { display: none; }
+  .row-date { flex: none; width: 64px; text-align: center; font-family: var(--f-sub); font-size: 43px; line-height: 1; color: var(--rose); }
+  .row-date span { display: block; font-family: var(--f-body); font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .row.past .row-date { color: var(--mauve); }
+  .row-main { flex-grow: 1; min-width: 0; }
+  .row-main strong { display: block; font-size: 18px; }
+  .row-main span { color: var(--muted); font-size: 14px; }
+  .arrow { color: var(--rose); font-size: 22px; }
+  @media (max-width: 480px) {
+    .row { gap: 14px; padding: 14px 16px; }
+    .row-date { width: 48px; font-size: 34px; }
+    .row-main strong { font-size: 16px; }
+  }
+  .empty { margin: 28px 0 0; font-size: 21px; font-weight: 400; color: var(--muted); }
+  .empty a { color: var(--rose); text-decoration: underline; }
+  .empty[hidden] { display: none; }
+
+  .faves { display: grid; grid-template-columns: 1fr; gap: 36px 28px; margin-top: 40px; align-items: start; }
+  @media (min-width: 560px) { .faves { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .faves { grid-template-columns: repeat(3, 1fr); } }
+  .polaroid { margin: 0; min-width: 0; position: relative; background: #fff; padding: 12px 12px 8px; box-shadow: 0 10px 28px rgba(90,50,60,.16); }
+  .polaroid img { display: block; width: 100%; height: 230px; object-fit: cover; }
+  .polaroid figcaption { font-size: 20px; text-align: center; padding: 10px 0 4px; color: var(--ink); }
 </style>

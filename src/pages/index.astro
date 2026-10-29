@@ -4,7 +4,7 @@ import EventCard from '../components/EventCard.astro';
 import JoinBand from '../components/JoinBand.astro';
 import Sponsors from '../components/Sponsors.astro';
 import { upcomingEvents } from '../data/events';
-import { RUBRIC_MEMBERSHIP_URL } from '../data/site';
+import { RUBRIC_MEMBERSHIP_URL, RUBRIC_EVENTS_URL } from '../data/site';
 
 // Typing headline: each character is its own span so it can type in one by one.
 const words = ['A', 'place', 'to', 'belong', 'in', 'tech.'];
@@ -31,11 +31,12 @@ const pillars = [
 ];
 
 const photos = [
-  { src: '/assets/photo-friends.jpg', alt: 'Members smiling together at a trivia night', cap: 'TRIVIA NIGHT', flex: '1.2 1 320px', h: 250, pos: '50% 40%', tilt: '-2deg' },
-  { src: '/assets/photo-paint.jpg', alt: 'Paint and sip night with bubble tea on the table', cap: 'PAINT AND SIP', flex: '1 1 240px', h: 250, pos: 'center', tilt: '2deg' },
-  { src: '/assets/photo-campus.jpg', alt: 'Students gathered at the UQLIT stall on campus lawns', cap: 'OUT ON CAMPUS', flex: '1.6 1 420px', h: 230, pos: 'center', tilt: '1deg' },
-  { src: '/assets/photo-panel.jpg', alt: 'A panel of speakers at the LIT Gala addressing a full room', cap: 'LIT GALA', flex: '1.5 1 400px', h: 250, pos: 'center', tilt: '-1.5deg' },
-  { src: '/assets/photo-network.jpg', alt: 'Students and industry guests mingling at a networking night', cap: 'HIGH FREQUENCY NETWORKING', flex: '1.5 1 400px', h: 250, pos: 'center', tilt: '1.5deg' },
+  { src: '/assets/events/trivia1.jpg', alt: 'Members smiling together around a table at trivia night', cap: 'TRIVIA NIGHT', flex: '1.2 1 320px', h: 250, pos: '50% 40%', tilt: '-2deg' },
+  { src: '/assets/events/paintnsip4.jpg', alt: 'Members painting mini canvases at a long table outdoors', cap: 'PAINT AND SIP', flex: '1 1 240px', h: 250, pos: 'center', tilt: '2deg' },
+  { src: '/assets/events/eaitcarnival.jpg', alt: 'Crowds of students at the UQLIT stall at the EAIT carnival', cap: 'OUT ON CAMPUS', flex: '1.6 1 420px', h: 230, pos: 'center', tilt: '1deg' },
+  { src: '/assets/events/litgala19.jpg', alt: 'A full room listening to speakers at the LIT Gala', cap: 'LIT GALA', flex: '1.5 1 360px', h: 250, pos: 'center 30%', tilt: '-1.5deg' },
+  { src: '/assets/events/hfn4.jpg', alt: 'Students and industry guests mingling at High Frequency Networking', cap: 'HIGH FREQUENCY NETWORKING', flex: '1.5 1 360px', h: 250, pos: 'center', tilt: '1.5deg' },
+  { src: '/assets/events/mockinterviews4.jpg', alt: 'Students practising interviews with industry guests at round tables', cap: 'MOCK INTERVIEWS', flex: '1.2 1 260px', h: 250, pos: 'center', tilt: '-1deg' },
 ];
 
 // A few extra so the page can drop ones that pass between rebuilds (see script below).
@@ -80,7 +81,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
       <div class="blob pop" style="--d: 1"></div>
       <div class="flt c-photo" style="--y: 30px">
         <figure class="polaroid pop lift taped" style="--d: 2">
-          <img src="/assets/photo-hug.png" alt="Two UQLIT members sharing a hug at an event" width="596" height="332" />
+          <img src="/assets/events/hfn10.jpg" alt="Two UQLIT members sharing a hug at High Frequency Networking" width="1600" height="1067" />
           <figcaption class="hand">CLOSEST FRIENDS FOUND HERE</figcaption>
         </figure>
       </div>
@@ -161,7 +162,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
       {upcoming.map((e, i) => <EventCard event={e} index={i} />)}
     </div>
     <p class="empty hand" id="home-events-empty" hidden={upcoming.length > 0}>
-      nothing on the calendar just yet. new events land on <a href={RUBRIC_MEMBERSHIP_URL} target="_blank" rel="noopener">Rubric</a> first ♡
+      nothing on the calendar just yet. new events land on <a href={RUBRIC_EVENTS_URL} target="_blank" rel="noopener">Rubric</a> first ♡
     </p>
   </section>
 
@@ -170,6 +171,39 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
 </Desktop>
 
 <script>
+  // Count-up stat stickers: run when each one scrolls into view; hovering replays it.
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const counters = document.querySelectorAll<HTMLElement>('.cnt');
+  if (!calm && 'IntersectionObserver' in window) {
+    const run = (el: HTMLElement) => {
+      const from = Number(getComputedStyle(el).getPropertyValue('--from')) || 0;
+      const to = Number(getComputedStyle(el).getPropertyValue('--to')) || 0;
+      const start = performance.now();
+      const dur = 1400;
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.style.setProperty('--num', String(Math.round(from + (to - from) * eased)));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          run(e.target as HTMLElement);
+          io.unobserve(e.target);
+        }
+      }
+    }, { threshold: 0.6 });
+    counters.forEach((el) => {
+      el.style.setProperty('--num', getComputedStyle(el).getPropertyValue('--from').trim() || '0');
+      io.observe(el);
+      el.addEventListener('mouseenter', () => run(el));
+      el.addEventListener('focus', () => run(el));
+    });
+  }
+
   // The site is built ahead of time, so hide any event that has passed since the last build
   // and show at most three.
   const list = document.getElementById('home-events');
@@ -214,7 +248,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
   .c-note { position: absolute; right: 0; bottom: 22px; }
   .c-spark { position: absolute; left: 0; bottom: 40px; width: 70px; height: 70px; }
   .collage .polaroid { width: 290px; padding: 12px 12px 14px; box-shadow: 0 14px 34px rgba(90,50,60,.2); rotate: -5deg; }
-  .collage .polaroid img { height: 210px; object-position: 60% 40%; }
+  .collage .polaroid img { height: 210px; object-position: 52% 30%; }
   .logo-sticker {
     width: 118px; height: 118px; border-radius: 50%;
     background: var(--cream); border: 4px solid #fff;

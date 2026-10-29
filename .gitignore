@@ -4,3 +4,6 @@ dist/
 .env
 .env.*
 .DS_Store
+
+# Original full-size photos (web copies live in public/assets/events/)
+Photos/

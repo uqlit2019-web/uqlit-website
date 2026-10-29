@@ -102,7 +102,15 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
   }
 
   .face { border-radius: 22px; border: 1px solid #E58FBF; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
-  .front { position: relative; width: 100%; background: var(--card-pink); color: #2F3556; overflow: hidden; }
+  .front { position: relative; width: 100%; background: var(--card-pink); color: #2F3556; overflow: hidden; transform: rotateY(0deg); }
+
+  /* Belt and braces for Safari, which doesn't always hide the face turned away:
+     swap which face is visible about a third of the way into the flip (when the card is edge-on). */
+  .front, .back { transition: visibility 0s linear .12s; }
+  .back { visibility: hidden; }
+  .mcard[aria-pressed='true'] .front { visibility: hidden; }
+  .mcard[aria-pressed='true'] .back { visibility: visible; }
+  @media (prefers-reduced-motion: reduce) { .front, .back { transition: none; } }
   .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; }
   .logo-dot { width: 46px; height: 46px; flex: none; border-radius: 50%; background: rgba(255,255,255,.28); display: flex; align-items: center; justify-content: center; }
   .logo-dot img { width: 28px; height: 28px; object-fit: contain; filter: brightness(0) invert(1); opacity: .9; }
@@ -131,8 +139,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
 
   .glare {
     position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.8), rgba(255,255,255,0) 55%);
-    mix-blend-mode: soft-light;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.35), rgba(255,255,255,0) 55%);
     opacity: 0; transition: opacity .3s;
   }
   .mcard:hover .glare { opacity: 1; }
