@@ -31,10 +31,10 @@ const pillars = [
 ];
 
 const photos = [
-  { src: '/assets/events/trivia1.jpg', alt: 'Members smiling together around a table at trivia night', cap: 'TRIVIA NIGHT', flex: '1.2 1 320px', h: 250, pos: '50% 40%', tilt: '-2deg', fall: true },
+  { src: '/assets/events/trivia1.jpg', alt: 'Members smiling together around a table at trivia night', cap: 'TRIVIA NIGHT', flex: '1.2 1 320px', h: 250, pos: '50% 40%', tilt: '-2deg' },
   { src: '/assets/events/paintnsip4.jpg', alt: 'Members painting mini canvases at a long table outdoors', cap: 'PAINT AND SIP', flex: '1 1 240px', h: 250, pos: 'center', tilt: '2deg' },
   { src: '/assets/events/eaitcarnival.jpg', alt: 'Crowds of students at the UQLIT stall at the EAIT carnival', cap: 'OUT ON CAMPUS', flex: '1.6 1 420px', h: 230, pos: 'center', tilt: '1deg' },
-  { src: '/assets/events/litgala19.jpg', alt: 'A full room listening to speakers at the LIT Gala', cap: 'LIT GALA', flex: '1.5 1 360px', h: 250, pos: 'center 30%', tilt: '-1.5deg', fall: true },
+  { src: '/assets/events/litgala19.jpg', alt: 'A full room listening to speakers at the LIT Gala', cap: 'LIT GALA', flex: '1.5 1 360px', h: 250, pos: 'center 30%', tilt: '-1.5deg' },
   { src: '/assets/events/hfn4.jpg', alt: 'Students and industry guests mingling at High Frequency Networking', cap: 'HIGH FREQUENCY NETWORKING', flex: '1.5 1 360px', h: 250, pos: 'center', tilt: '1.5deg' },
   { src: '/assets/events/mockinterviews4.jpg', alt: 'Students practising interviews with industry guests at round tables', cap: 'MOCK INTERVIEWS', flex: '1.2 1 260px', h: 250, pos: 'center', tilt: '-1deg' },
 ];
@@ -141,7 +141,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
     </div>
     <div class="gallery">
       {photos.map((p, i) => (
-        <figure class:list={['polaroid', p.fall ? 'fall' : 'rv', 'lift', 'taped']} style={`--d: ${i % 3}; flex: ${p.flex}; rotate: ${p.tilt}`}>
+        <figure class:list={['polaroid', 'fall', 'lift', 'taped']} style={`--d: ${i % 3}; flex: ${p.flex}; rotate: ${p.tilt}`}>
           <img src={p.src} alt={p.alt} loading="lazy" class="dev" style={`height: ${p.h}px; object-position: ${p.pos}`} />
           <figcaption class="hand">{p.cap}</figcaption>
         </figure>

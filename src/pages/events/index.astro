@@ -9,10 +9,10 @@ const tilt = (i: number) => `${((i % 3) - 1) * 0.6}deg`;
 
 const faves = [
   { src: '/assets/events/litgala20.jpg', alt: 'Members chatting in front of a WID banner at the LIT Gala', cap: 'LIT GALA', tilt: '-1.5deg' },
-  { src: '/assets/events/hfn2026.jpg', alt: 'Members talking with industry guests at High Frequency Networking 2026', cap: 'HIGH FREQUENCY NETWORKING', tilt: '1.5deg', fall: true },
+  { src: '/assets/events/hfn2026.jpg', alt: 'Members talking with industry guests at High Frequency Networking 2026', cap: 'HIGH FREQUENCY NETWORKING', tilt: '1.5deg' },
   { src: '/assets/events/paintnsip2.jpg', alt: 'Mini canvases, paints and bubble tea on the table at Paint and Sip', cap: 'PAINT AND SIP', tilt: '-1deg' },
   { src: '/assets/events/resumebuilding1.jpg', alt: 'A photographer taking professional headshots at Resume Building', cap: 'HEADSHOTS', tilt: '1deg' },
-  { src: '/assets/events/mockinterviews1.jpg', alt: 'A student in a one-on-one mock interview with an industry guest', cap: 'MOCK INTERVIEWS', tilt: '-2deg', fall: true },
+  { src: '/assets/events/mockinterviews1.jpg', alt: 'A student in a one-on-one mock interview with an industry guest', cap: 'MOCK INTERVIEWS', tilt: '-2deg' },
   { src: '/assets/events/launchpicnic5.jpg', alt: 'Two members by the Ladies in Technology banner at the launch picnic', cap: 'LAUNCH PICNIC', tilt: '1.5deg', pos: 'center 35%' },
 ];
 ---
@@ -105,7 +105,7 @@ const faves = [
     </div>
     <div class="faves">
       {faves.map((f, i) => (
-        <figure class:list={['polaroid', f.fall ? 'fall' : 'rv', 'lift', 'taped']} style={`--d: ${i % 3}; rotate: ${f.tilt}`}>
+        <figure class:list={['polaroid', 'fall', 'lift', 'taped']} style={`--d: ${i % 3}; rotate: ${f.tilt}`}>
           <img src={f.src} alt={f.alt} loading="lazy" class="dev" style={f.pos ? `object-position: ${f.pos}` : undefined} />
           <figcaption class="hand">{f.cap}</figcaption>
         </figure>
