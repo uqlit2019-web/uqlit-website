@@ -1,0 +1,63 @@
+---
+import { featured, supporting } from '../data/sponsors';
+
+const featTilt = ['-2deg', '1.5deg', '-1deg', '2deg'];
+const supTilt = ['1.5deg', '-2deg', '1deg', '-1.5deg', '-1deg', '2deg', '-1deg'];
+---
+
+<section id="sponsors" class="sponsors">
+  <div class="intro rv">
+    <div class="hand kicker">with thanks to</div>
+    <h2 class="h2">Our sponsors</h2>
+    <p>The partners who help us bring mentors, events and opportunities to our members.</p>
+  </div>
+
+  <div class="tier rv"><span>Featured partners</span><span class="line"></span></div>
+  <ul class="grid feat">
+    {featured.map((s, i) => (
+      <li class="tile rv lift taped" style={`--d: ${i % 4}; rotate: ${featTilt[i % featTilt.length]}`}>
+        <img src={s.logo} alt={s.name} style={`max-height: ${s.maxHeight}px`} loading="lazy" />
+      </li>
+    ))}
+  </ul>
+
+  <div class="tier rv"><span>Supporting partners</span><span class="line"></span></div>
+  <ul class="grid sup">
+    {supporting.map((s, i) => (
+      <li class="tile rv lift" style={`--d: ${i % 4}; rotate: ${supTilt[i % supTilt.length]}`}>
+        <img src={s.logo} alt={s.name} style={`max-height: ${s.maxHeight}px`} loading="lazy" />
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .sponsors {
+    padding: clamp(44px, 6vw, 80px) var(--pad-x) clamp(56px, 7vw, 96px);
+    background: var(--tint);
+    scroll-margin-top: 40px;
+  }
+  .intro { text-align: center; max-width: 620px; margin: 0 auto; }
+  .kicker { font-size: 21px; color: var(--rose); }
+  .intro p { margin: 14px 0 0; color: var(--muted); font-size: 17px; line-height: 1.6; }
+
+  .tier {
+    margin: 48px 0 18px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+  }
+  .tier + .grid + .tier, .sup + .tier { margin-top: 40px; }
+  .line { flex-grow: 1; height: 1px; background: rgba(120,106,106,.35); }
+
+  .grid { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; }
+  .feat { gap: 24px; }
+  .sup { gap: 20px; }
+  .tile {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border-radius: 8px;
+  }
+  .feat .tile { flex: 1 1 230px; height: 150px; padding: 24px; box-shadow: 0 8px 22px rgba(90,50,60,.12); }
+  .sup .tile { flex: 1 1 190px; height: 110px; padding: 18px; box-shadow: 0 6px 18px rgba(90,50,60,.1); }
+  .tile img { max-width: 100%; object-fit: contain; }
+</style>

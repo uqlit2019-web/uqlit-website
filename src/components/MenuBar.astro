@@ -1,0 +1,54 @@
+---
+import type { PageKey } from '../layouts/Desktop.astro';
+
+interface Props {
+  page: PageKey;
+  joinHref: string;
+}
+
+const { page, joinHref } = Astro.props;
+
+const links: { key: PageKey | 'sponsors'; label: string; href: string }[] = [
+  { key: 'home', label: 'Home', href: '/' },
+  { key: 'about', label: 'About', href: '/about/' },
+  { key: 'team', label: 'Team', href: '/team/' },
+  { key: 'events', label: 'Events', href: '/events/' },
+  { key: 'sponsors', label: 'Sponsors', href: page === 'home' ? '#sponsors' : '/#sponsors' },
+];
+---
+
+<nav class="menubar" aria-label="Main">
+  <a class="brand" href="/">
+    <img src="/assets/logo-lit.png" alt="" width="22" height="22" />
+    <span>UQLIT</span>
+  </a>
+  {links.map((l) => (
+    <a class="mb" href={l.href} aria-current={l.key === page ? 'page' : undefined}>{l.label}</a>
+  ))}
+  <span class="spacer"></span>
+  <a class="mb join" href={joinHref} target="_blank" rel="noopener">Join on Rubric ↗</a>
+</nav>
+
+<style>
+  .menubar {
+    position: sticky; top: 0; z-index: 50;
+    height: 38px;
+    display: flex; align-items: center; gap: 4px;
+    padding: 0 14px;
+    background: rgba(255,249,242,.62);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(120,106,106,.18);
+    font-size: 13px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; padding: 4px 10px 4px 4px; margin-right: 6px; flex: none; }
+  .brand img { width: 22px; height: 22px; object-fit: contain; }
+  .mb { padding: 5px 10px; border-radius: 6px; transition: background .2s; flex: none; }
+  .mb:hover, .mb:focus-visible { background: rgba(184,64,95,.14); }
+  .mb[aria-current='page'] { font-weight: 700; }
+  .spacer { flex-grow: 1; }
+  .join { padding: 5px 12px; color: var(--rose); font-weight: 700; }
+</style>

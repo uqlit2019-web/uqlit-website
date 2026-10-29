@@ -1,0 +1,324 @@
+---
+import '../styles/global.css';
+import MenuBar from '../components/MenuBar.astro';
+import Dock from '../components/Dock.astro';
+import { RUBRIC_MEMBERSHIP_URL } from '../data/site';
+
+export type PageKey = 'home' | 'about' | 'team' | 'events';
+
+interface Props {
+  page: PageKey;
+  title: string;        // <title>
+  windowTitle: string;  // shown in the window's title bar
+  description?: string;
+}
+
+const {
+  page,
+  title,
+  windowTitle,
+  description = 'UQ Ladies in Technology: a supportive community for women and gender minorities in tech at UQ. Membership is $2 for the whole year.',
+} = Astro.props;
+
+const joinHref = RUBRIC_MEMBERSHIP_URL;
+// Position of this page's tile in the dock (LIT = 0), so the window opens out of it.
+const tileIndex = { home: 0, about: 1, team: 2, events: 3 }[page];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#EBC4C4" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/assets/photo-team.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400..700&family=Kalam:wght@300;400;700&display=swap"
+    />
+    {page === 'home' && (
+      // The splash (cursor opens the LIT app) plays once per browser session.
+      <script is:inline>
+        try {
+          if (!sessionStorage.getItem('uqlit-splash')) {
+            document.documentElement.classList.add('splash');
+            sessionStorage.setItem('uqlit-splash', '1');
+          }
+        } catch (e) {}
+      </script>
+    )}
+  </head>
+  <body>
+    <div class="desktop" style={`--tile-i: ${tileIndex}`}>
+      <a class="skip" href="#content">Skip to content</a>
+      <MenuBar page={page} joinHref={joinHref} />
+
+      <div class="win-wrap" id="win-wrap">
+        <main class="win" id="content">
+          <div class="titlebar">
+            <div class="tls">
+              <button type="button" class="tlb" data-win="close" aria-label="Close window" style="background:#EC6A5E"><span class="tg" aria-hidden="true">×</span></button>
+              <button type="button" class="tlb" data-win="min" aria-label="Minimise window to the dock" style="background:#F4BE4F"><span class="tg" aria-hidden="true">−</span></button>
+              <button type="button" class="tlb" data-win="full" aria-label="Toggle full screen" aria-pressed="false" style="background:#61C454"><span class="tg" aria-hidden="true">+</span></button>
+            </div>
+            <div class="wtitle">UQLIT — {windowTitle}</div>
+            <div class="ld" aria-hidden="true"></div>
+          </div>
+
+          <slot />
+
+          <footer class="foot">
+            <div class="foot-brand">
+              <img src="/assets/logo-lit.png" alt="" width="42" height="42" />
+              <span><strong>UQ Ladies in Technology</strong><br />© {new Date().getFullYear()} UQLIT</span>
+            </div>
+            <div class="foot-links">
+              <a href="/about/">About</a>
+              <a href="/events/">Events</a>
+              <a href={page === 'home' ? '#sponsors' : '/#sponsors'}>Sponsors</a>
+              <a href={joinHref} class="foot-join" target="_blank" rel="noopener">Join on Rubric ↗</a>
+            </div>
+          </footer>
+        </main>
+      </div>
+
+      <div class="hidden-msg" id="hidden-msg" role="status" hidden>
+        <span id="hidden-text"></span>
+        <span aria-hidden="true" class="bob">↓</span>
+      </div>
+
+      <Dock page={page} joinHref={joinHref} />
+
+      {page === 'home' && (
+        <Fragment>
+          <div class="rip" aria-hidden="true"></div>
+          <svg class="cur" aria-hidden="true" width="30" height="30" viewBox="0 0 24 24"><path d="M4 2v18l4.5-4.5L12 22l2.5-1.2L11 14.5h6.5z" fill="#FFFFFF" stroke="#3A2F2F" stroke-width="1.5" stroke-linejoin="round" /></svg>
+        </Fragment>
+      )}
+    </div>
+
+    <script>
+      const wrap = document.getElementById('win-wrap')!;
+      const win = wrap.querySelector('.win') as HTMLElement;
+      const msg = document.getElementById('hidden-msg')!;
+      const msgText = document.getElementById('hidden-text')!;
+      const lit = document.getElementById('dock-lit')!;
+      const fullBtn = document.querySelector('[data-win="full"]')!;
+      const onHome = location.pathname === '/';
+
+      function hide(how: 'closed' | 'min') {
+        // Shrink toward the LIT tile, wherever the page is scrolled to.
+        const w = wrap.getBoundingClientRect();
+        const t = lit.getBoundingClientRect();
+        wrap.style.transformOrigin = `${t.left + t.width / 2 - w.left}px ${t.top + t.height / 2 - w.top}px`;
+        wrap.classList.add('is-hidden');
+        msgText.textContent = how === 'closed'
+          ? 'window closed. click LIT in the dock to bring it back'
+          : 'tucked away in the dock. click LIT to open it again';
+        msg.hidden = false;
+        lit.focus({ preventScroll: true });
+      }
+
+      function show() {
+        wrap.classList.remove('is-hidden');
+        msg.hidden = true;
+      }
+
+      document.querySelector('[data-win="close"]')!.addEventListener('click', () => hide('closed'));
+      document.querySelector('[data-win="min"]')!.addEventListener('click', () => hide('min'));
+      fullBtn.addEventListener('click', () => {
+        const full = win.classList.toggle('is-full');
+        fullBtn.setAttribute('aria-pressed', String(full));
+      });
+
+      lit.addEventListener('click', (e) => {
+        if (wrap.classList.contains('is-hidden')) {
+          e.preventDefault();
+          show();
+        } else if (onHome) {
+          e.preventDefault();
+          window.scrollTo({ top: 0 });
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  :root {
+    --tile: 52px;
+    --gap: 16px;
+  }
+  @media (max-width: 560px) {
+    :root { --tile: 40px; --gap: 9px; }
+  }
+
+  .desktop {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: clip;
+    background-color: var(--blush);
+    background-image: radial-gradient(rgba(255,249,242,.55) 1.5px, transparent 1.6px);
+    background-size: 26px 26px;
+    display: flex;
+    flex-direction: column;
+    /* Horizontal offset of this page's dock tile from the screen centre.
+       Dock row = 6 tiles + 6 gaps + 1px separator. */
+    --dock-w: calc(6 * var(--tile) + 6 * var(--gap) + 1px);
+    --tile-x: calc(var(--tile) / 2 - var(--dock-w) / 2 + var(--tile-i) * (var(--tile) + var(--gap)));
+  }
+
+  .skip {
+    position: absolute; left: 12px; top: -60px; z-index: 100;
+    background: var(--ink); color: var(--cream);
+    padding: 10px 14px; border-radius: 8px; font-weight: 600;
+  }
+  .skip:focus { top: 48px; }
+
+  /* ---------- Window ---------- */
+  .win-wrap {
+    position: relative; z-index: 1;
+    pointer-events: none;
+    max-height: 30000px;
+    transition: transform .5s cubic-bezier(.5,0,.2,1), opacity .4s ease, max-height 0s linear 0s;
+  }
+  .win-wrap.is-hidden {
+    transform: scale(.04);
+    opacity: 0;
+    max-height: 0;
+    overflow: clip;
+    transition: transform .5s cubic-bezier(.5,0,.2,1), opacity .4s ease, max-height 0s linear .5s;
+  }
+
+  .win {
+    display: block;
+    width: min(1180px, calc(100% - 28px));
+    margin: 28px auto 0;
+    pointer-events: auto;
+    background: var(--cream);
+    border-radius: 16px;
+    border: 1px solid rgba(120,106,106,.3);
+    box-shadow: 0 30px 70px rgba(90,50,60,.28), 0 2px 0 rgba(255,255,255,.7) inset;
+    overflow: clip;
+    transition: width .45s ease, margin .45s ease, border-radius .45s ease;
+  }
+  .win.is-full { width: 100%; margin: 0; border-radius: 0; }
+  .is-hidden .win { pointer-events: none; }
+  @media (max-width: 560px) {
+    .win { width: calc(100% - 16px); margin-top: 12px; border-radius: 12px; }
+  }
+
+  .titlebar {
+    position: relative;
+    height: 44px;
+    display: flex; align-items: center;
+    padding: 0 18px;
+    border-bottom: 1px solid rgba(120,106,106,.14);
+  }
+  .tls { display: flex; gap: 8px; position: relative; z-index: 2; }
+  .tlb {
+    position: relative;
+    width: 14px; height: 14px; padding: 0;
+    border: 0; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tlb::before { content: ""; position: absolute; inset: -8px; }
+  .tg { font: 700 10px/1 sans-serif; color: rgba(60,30,30,.8); opacity: 0; transition: opacity .15s; }
+  .tls:hover .tg, .tlb:focus-visible .tg { opacity: 1; }
+  .wtitle {
+    position: absolute; left: 0; right: 0;
+    text-align: center; font-size: 13px; color: var(--muted);
+    pointer-events: none;
+  }
+  @media (max-width: 420px) {
+    .wtitle { padding-left: 60px; }
+  }
+  .ld {
+    position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 3px; background: var(--rose);
+    opacity: 0;
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 18px 32px;
+    padding: 28px var(--pad-x);
+    border-top: 1px solid rgba(120,106,106,.2);
+    font-size: 14px; color: var(--muted);
+  }
+  .foot-brand { display: flex; align-items: center; gap: 12px; }
+  .foot-brand img { width: 42px; height: 42px; object-fit: contain; }
+  .foot-brand strong { color: var(--ink); }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-weight: 500; }
+  .foot-links a:hover { color: var(--rose); }
+  .foot-join { color: var(--rose); font-weight: 700; }
+
+  /* ---------- Hidden-window message ---------- */
+  .hidden-msg {
+    position: fixed; inset: 0 0 110px 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; padding: 0 24px;
+    text-align: center; pointer-events: none;
+    font-family: var(--f-hand); font-weight: 700; font-size: 22px; color: #6B3A4A;
+  }
+  .hidden-msg[hidden] { display: none; }
+  .hidden-msg .bob { font-size: 38px; color: var(--rose); }
+
+  /* ---------- Splash pieces (home only) ---------- */
+  .cur, .rip { display: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Window opens out of this page's dock tile */
+    .win {
+      transform-origin: calc(50% + var(--tile-x)) calc(100vh - 128px);
+      animation: winopen .7s cubic-bezier(.2,.9,.25,1.05) .1s both;
+    }
+    @keyframes winopen { from { opacity: 0; transform: scale(.04); } 25% { opacity: 1; } to { opacity: 1; transform: none; } }
+
+    :global(html.splash) .win { animation: winopen .9s cubic-bezier(.2,.9,.25,1.05) 2s both; }
+    :global(html.splash) { --pop-base: 2.7s; }
+    :global(html.splash) .ld { animation: ld .9s ease-out 2.4s both; }
+    @keyframes ld { 0% { opacity: 1; transform: scaleX(0); } 80% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+    .ld { transform-origin: left; }
+
+    :global(html.splash) .cur {
+      display: block;
+      position: fixed; left: 0; top: 0; z-index: 200;
+      pointer-events: none; opacity: 0;
+      animation: cur 2.1s ease-in-out .4s both;
+    }
+    @keyframes cur {
+      0% { opacity: 0; translate: 72vw 14vh; }
+      10% { opacity: 1; }
+      55% { translate: 60vw 56vh; }
+      76% { translate: calc(50vw + var(--tile-x)) calc(100vh - 64px); scale: 1; }
+      82% { scale: .8; }
+      88% { scale: 1; }
+      95% { opacity: 1; }
+      100% { opacity: 0; translate: calc(50vw + var(--tile-x)) calc(100vh - 64px); }
+    }
+
+    :global(html.splash) .rip {
+      display: block;
+      position: fixed; left: 0; top: 0; z-index: 150;
+      pointer-events: none;
+      width: 46px; height: 46px; margin: -23px 0 0 -23px;
+      border-radius: 50%; border: 3px solid var(--rose);
+      translate: calc(50vw + var(--tile-x)) calc(100vh - 62px);
+      opacity: 0;
+      animation: rip .6s ease-out 1.95s both;
+    }
+    @keyframes rip { from { opacity: .9; scale: .3; } to { opacity: 0; scale: 1.7; } }
+  }
+</style>

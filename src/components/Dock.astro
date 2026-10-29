@@ -1,0 +1,167 @@
+---
+import type { PageKey } from '../layouts/Desktop.astro';
+
+interface Props {
+  page: PageKey;
+  joinHref: string;
+}
+
+const { page, joinHref } = Astro.props;
+const onHome = page === 'home';
+
+// Stroke icons, 24x24 viewBox
+const icons = {
+  about: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".7" fill="currentColor"/>',
+  team: '<circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 14.2c3 0 5.5 1.8 5.5 4.8"/>',
+  events: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  sponsors: '<path d="M12 20s-8-4.9-8-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5C20 15.1 12 20 12 20z"/>',
+  join: '<path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4z"/><path d="M14 7v10" stroke-dasharray="2 2"/>',
+};
+
+const tiles: { key: 'about' | 'team' | 'events' | 'sponsors'; label: string; href: string; badge?: boolean }[] = [
+  { key: 'about', label: 'About', href: '/about/' },
+  { key: 'team', label: 'Team', href: '/team/' },
+  { key: 'events', label: 'Events', href: '/events/', badge: true },
+  { key: 'sponsors', label: 'Sponsors', href: onHome ? '#sponsors' : '/#sponsors' },
+];
+---
+
+<div class="dock-wrap">
+  <nav aria-label="Dock" class="dock">
+    <a
+      class:list={['dk', 'lit', 'gl', { gcur: onHome }]}
+      id="dock-lit"
+      href="/"
+      data-label="LIT"
+      aria-label="LIT, home"
+      aria-current={onHome ? 'page' : undefined}
+    >
+      <img src="/assets/logo-lit.png" alt="" />
+      <span class="litdot" aria-hidden="true"></span>
+    </a>
+    {tiles.map((t) => (
+      <a
+        class:list={['dk', t.key === page ? 'ga me' : 'gl']}
+        href={t.href}
+        data-label={t.label}
+        aria-label={t.label}
+        aria-current={t.key === page ? 'page' : undefined}
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons[t.key]} />
+        {t.badge && <span class="badge" aria-hidden="true"></span>}
+      </a>
+    ))}
+    <span class="sep" aria-hidden="true"></span>
+    <a class="dk gd" href={joinHref} target="_blank" rel="noopener" data-label="Join on Rubric" aria-label="Join on Rubric">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons.join} />
+    </a>
+  </nav>
+</div>
+
+<style>
+  .dock-wrap {
+    position: sticky; bottom: 14px; z-index: 50;
+    display: flex; justify-content: center;
+    padding: 56px 12px 16px;
+    margin-top: auto;
+    pointer-events: none;
+  }
+
+  /* Liquid glass */
+  .dock {
+    position: relative;
+    pointer-events: auto;
+    display: flex; align-items: flex-end; gap: var(--gap);
+    padding: 12px 18px;
+    border-radius: 34px;
+    background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.2));
+    backdrop-filter: blur(24px) saturate(1.9) brightness(1.06);
+    -webkit-backdrop-filter: blur(24px) saturate(1.9) brightness(1.06);
+    border: 1px solid rgba(255,255,255,.8);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255,255,255,.95),
+      inset 0 -1.5px 0 rgba(255,255,255,.4),
+      inset 0 0 26px rgba(255,255,255,.4),
+      0 18px 44px rgba(120,60,80,.3);
+  }
+  .dock::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(120deg, rgba(255,255,255,.75) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 68%, rgba(255,255,255,.4) 100%);
+  }
+
+  .dk {
+    position: relative; flex: none;
+    width: var(--tile); height: var(--tile);
+    border-radius: calc(var(--tile) * .33);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--rose);
+    transition: width .24s cubic-bezier(.3,1.5,.5,1), height .24s cubic-bezier(.3,1.5,.5,1), box-shadow .2s;
+  }
+  .dk svg { width: 52%; height: 52%; }
+  .dk img { width: 70%; height: 70%; object-fit: contain; }
+
+  /* Magnification: tiles grow in size (not scale) so neighbours make room and never overlap */
+  @media (hover: hover) {
+    .dk:hover, .dk:focus-visible { width: calc(var(--tile) * 82 / 52); height: calc(var(--tile) * 82 / 52); }
+    .dk:hover + .dk, .dk:has(+ .dk:hover) { width: calc(var(--tile) * 66 / 52); height: calc(var(--tile) * 66 / 52); }
+    .dk:hover + .dk + .dk, .dk:has(+ .dk + .dk:hover) { width: calc(var(--tile) * 57 / 52); height: calc(var(--tile) * 57 / 52); }
+    .dk:hover { box-shadow: inset 0 1px 0 #fff, 0 12px 26px rgba(184,64,95,.38); }
+  }
+
+  /* Tooltip */
+  .dk::after {
+    content: attr(data-label);
+    position: absolute; bottom: calc(100% + 12px); left: 50%; translate: -50% 0;
+    background: rgba(58,47,47,.88); color: var(--cream);
+    font: 500 12px/1 var(--f-body);
+    padding: 7px 11px; border-radius: 9px;
+    opacity: 0; pointer-events: none; white-space: nowrap;
+    transition: opacity .2s;
+  }
+  .dk:hover::after, .dk:focus-visible::after { opacity: 1; }
+
+  /* Tile finishes */
+  .gl {
+    background: linear-gradient(160deg, rgba(255,255,255,.9), rgba(255,255,255,.45));
+    border: 1px solid rgba(255,255,255,.9);
+    box-shadow: inset 0 1px 0 #fff, inset 0 -7px 12px rgba(255,255,255,.3), 0 7px 16px rgba(120,60,80,.22);
+  }
+  .ga {
+    background: linear-gradient(160deg, rgba(226,116,142,.97), rgba(184,64,95,.94));
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.6);
+    box-shadow: inset 0 1.5px 0 rgba(255,255,255,.6), inset 0 -8px 14px rgba(120,30,55,.25), 0 7px 16px rgba(120,40,70,.35);
+  }
+  .gd {
+    background: linear-gradient(160deg, rgba(96,82,82,.94), rgba(40,30,30,.94));
+    color: var(--cream);
+    border: 1px solid rgba(255,255,255,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 7px 16px rgba(0,0,0,.3);
+  }
+  .gcur { outline: 2px solid var(--rose); outline-offset: 3px; }
+
+  .sep { align-self: center; width: 1px; height: calc(var(--tile) * .7); background: rgba(120,106,106,.4); }
+
+  .litdot {
+    position: absolute; bottom: -10px; left: 50%;
+    width: 5px; height: 5px; margin-left: -2.5px;
+    border-radius: 50%; background: var(--ink);
+  }
+  .badge {
+    position: absolute; top: -4px; right: -4px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--rose); border: 2px solid var(--cream);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .badge { animation: ping 1.8s ease-out infinite; }
+    @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(184,64,95,.55); } 100% { box-shadow: 0 0 0 12px rgba(184,64,95,0); } }
+
+    /* Current app bounces as the window opens */
+    .me, :global(html:not(.splash)) .gcur { animation: litb .9s ease-out .6s both; }
+    :global(html.splash) .lit { animation: litb 1.1s ease-out 1.95s both; }
+    :global(html.splash) .litdot { animation: litdot .3s ease-out 2.3s both; }
+    @keyframes litb { 0% { transform: scale(.8); } 22% { transform: translateY(-24px); } 42% { transform: none; } 62% { transform: translateY(-12px); } 82%, 100% { transform: none; } }
+    @keyframes litdot { from { opacity: 0; scale: 0; } }
+  }
+</style>
