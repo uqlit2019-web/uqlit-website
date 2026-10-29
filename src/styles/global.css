@@ -91,9 +91,6 @@ img { max-width: 100%; }
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
-/* Count-up numbers: --num is animated by the page's script (see countUp on the home page) */
-.cnt { counter-reset: n var(--num, var(--to, 0)); }
-.cnt::after { content: counter(n) var(--suf, ''); }
 
 /* ---------- Animations (motion-safe only) ---------- */
 @media (prefers-reduced-motion: no-preference) {
@@ -109,23 +106,24 @@ img { max-width: 100%; }
   .bob { animation: bob 1.2s ease-in-out infinite; }
   @keyframes bob { 50% { translate: 0 10px; } }
 
-  @supports (animation-timeline: view()) {
-    .rv {
-      opacity: 0;
-      animation: rv linear both; animation-timeline: view();
-      animation-range: entry calc(var(--d, 0) * 6%) entry calc(70% + var(--d, 0) * 6%);
-    }
-    @keyframes rv { from { opacity: 0; transform: translateY(56px) scale(.95); } to { opacity: 1; transform: none; } }
+  /* Scroll reveals. The layout script adds .in as each element scrolls into view.
+     html.anim is only set (in <head>) when scripts run and motion is allowed,
+     so without it everything simply shows. */
+  html.anim .rv:not(.in) { opacity: 0; }
+  html.anim .rv.in { animation: rv .8s cubic-bezier(.2,.8,.3,1) both; animation-delay: calc(var(--d, 0) * 90ms); }
+  @keyframes rv { from { opacity: 0; transform: translateY(56px) scale(.95); } to { opacity: 1; transform: none; } }
 
-    .flt { animation: flt linear both; animation-timeline: view(); animation-range: cover; }
-    @keyframes flt { from { transform: translateY(var(--y, 50px)); } to { transform: translateY(calc(var(--y, 50px) * -1)); } }
+  html.anim .grow { transform-origin: left; }
+  html.anim .grow:not(.in) { transform: scaleX(0); }
+  html.anim .grow.in { animation: grow .9s cubic-bezier(.2,.8,.3,1) .15s both; }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-    .grow { transform-origin: left; animation: grow linear both; animation-timeline: view(); animation-range: entry 10% entry 90%; }
-    @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  /* photos "develop" from faded black-and-white into colour */
+  html.anim .dev:not(.in) { filter: grayscale(1) sepia(.3) blur(10px) brightness(1.35) contrast(.8); }
+  html.anim .dev.in { animation: dev 1.6s ease-out .1s both; }
+  @keyframes dev { from { filter: grayscale(1) sepia(.3) blur(10px) brightness(1.35) contrast(.8); } to { filter: none; } }
 
-    .dev { animation: dev linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
-    @keyframes dev { from { filter: grayscale(1) sepia(.3) blur(10px) brightness(1.35) contrast(.8); } to { filter: none; } }
-  }
+  /* .flt (floating hero stickers) drift with scroll; moved by the layout script */
 }
 
 /* ---------- Desktop toys: sparkle trail + click-to-drop stickers ---------- */

@@ -56,6 +56,12 @@ const footerLinks = [
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400..700&family=Kalam:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap"
     />
+    <script is:inline>
+      // Turn on scroll reveals only when scripts run and motion is allowed (see .rv/.dev/.grow in global.css)
+      if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('anim');
+      }
+    </script>
     {page === 'home' && (
       // The splash (cursor opens the LIT app) plays whenever Home loads,
       // except when arriving at a section like /#sponsors. Any click or key skips it.
@@ -217,6 +223,57 @@ const footerLinks = [
         stickers.push(el);
         if (stickers.length > 10) stickers.shift()!.remove();
       });
+
+      // ---------- Scroll effects (work in every browser) ----------
+      if (document.documentElement.classList.contains('anim')) {
+        // Reveal cards and photos, develop photos and grow underlines as they come into view
+        const reveal = new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              reveal.unobserve(e.target);
+            }
+          }
+        }, { rootMargin: '0px 0px -8% 0px' });
+        let pending = [...document.querySelectorAll<HTMLElement>('.rv, .dev, .grow')];
+        pending.forEach((el) => reveal.observe(el));
+
+        // A fast jump (section link, End key) can skip right past an element without it ever
+        // crossing the screen, so also reveal anything that's already above the bottom of the screen.
+        let sweepQueued = false;
+        const sweep = () => {
+          sweepQueued = false;
+          pending = pending.filter((el) => {
+            if (el.classList.contains('in')) return false;
+            if (el.getBoundingClientRect().top < innerHeight) {
+              el.classList.add('in');
+              reveal.unobserve(el);
+              return false;
+            }
+            return true;
+          });
+        };
+        addEventListener('scroll', () => { if (!sweepQueued && pending.length) { sweepQueued = true; requestAnimationFrame(sweep); } }, { passive: true });
+
+        // Floating stickers drift up as you scroll past (down by --y at the bottom of the screen, up by --y at the top)
+        const floaters = [...document.querySelectorAll<HTMLElement>('.flt')];
+        if (floaters.length) {
+          let queued = false;
+          const drift = () => {
+            queued = false;
+            const vh = innerHeight;
+            for (const el of floaters) {
+              const r = el.parentElement!.getBoundingClientRect();
+              if (r.bottom < 0 || r.top > vh) continue;
+              const p = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+              const y = parseFloat(getComputedStyle(el).getPropertyValue('--y')) || 50;
+              el.style.translate = `0 ${(y * (1 - 2 * p)).toFixed(1)}px`;
+            }
+          };
+          addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(drift); } }, { passive: true });
+          drift();
+        }
+      }
 
       // Links like /#sponsors: the browser jumps while the window is still growing open,
       // so it measures the shrunken window and lands in the wrong place. Work out the
