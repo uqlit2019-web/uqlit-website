@@ -1,0 +1,51 @@
+---
+import MembershipCard from './MembershipCard.astro';
+import { RUBRIC_MEMBERSHIP_URL } from '../data/site';
+
+interface Props {
+  kicker?: string;
+  heading?: string;
+  text?: string;
+}
+
+const {
+  kicker = 'come sit with us',
+  heading = 'Become a member',
+  text = 'Get your membership on Rubric and join a community that has your back, at uni and beyond.',
+} = Astro.props;
+---
+
+<section id="join" class="join">
+  <div class="band rv">
+    <div class="copy">
+      <div class="hand kicker">{kicker}</div>
+      <h2>{heading}</h2>
+      <p>{text}</p>
+      <div class="cta">
+        <a class="btn join-btn" href={RUBRIC_MEMBERSHIP_URL} target="_blank" rel="noopener">Join on Rubric <span aria-hidden="true">↗</span></a>
+        <span class="hand price">$2 for the whole year</span>
+      </div>
+    </div>
+    <MembershipCard />
+  </div>
+</section>
+
+<style>
+  .join { padding: clamp(40px, 6vw, 80px) var(--pad-x); scroll-margin-top: 40px; }
+  .band {
+    position: relative;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 36px 56px;
+    background: var(--rose); color: var(--cream);
+    border-radius: 28px;
+    padding: clamp(24px, 5vw, 64px);
+    box-shadow: 0 18px 0 rgba(90,40,55,.16);
+  }
+  .copy { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+  .kicker { font-size: 23px; color: var(--blush-3); }
+  h2 { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(36px, 4.6vw, 60px); line-height: 1.05; }
+  p { margin: 0; font-size: 18px; line-height: 1.6; }
+  .cta { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 6px; }
+  .join-btn { min-height: 54px; padding: 0 30px; background: var(--cream); color: #8E2F48; font-size: 17px; box-shadow: 0 6px 0 rgba(0,0,0,.2); }
+  .join-btn:focus-visible { outline-color: var(--cream); }
+  .price { font-weight: 400; font-size: 20px; color: var(--blush-3); }
+</style>

@@ -1,0 +1,152 @@
+---
+const bars = [[0,2],[4,2],[7,1],[9,2],[12,3],[17,1],[19,2],[24,1],[27,1],[31,1],[33,1],[35,3],[41,1],[44,1],[47,2],[52,1],[54,3],[59,3],[64,1],[67,2],[70,3],[74,3],[78,3],[83,2],[88,2],[93,3],[99,2],[103,1],[106,4],[112,1],[115,3],[121,2],[126,2],[129,1],[133,1],[136,1],[140,2],[143,4],[148,3],[153,2],[157,3],[163,3],[169,1],[171,2],[176,4],[181,1],[184,4],[191,2]];
+const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.4-11-11C9.2 10.4 11.4 6.2 12 1z';
+---
+
+<div class="mcard-wrap">
+  <button type="button" class="mcard" aria-label="Flip membership card" aria-pressed="false">
+    <div class="face front">
+      <div class="top">
+        <span class="logo-dot"><img src="/assets/logo-lit.png" alt="UQLIT logo" /></span>
+        <span class="mtitle">Membership</span>
+      </div>
+      <div class="band">
+        <div class="stripe s1" aria-hidden="true"></div>
+        <div class="stripe s2" aria-hidden="true"></div>
+        <img src="/assets/logo-lit.png" alt="" class="band-logo" />
+        <div class="ladies">LADIES IN</div>
+        <div class="tech">TECHNOLOGY</div>
+        <svg aria-hidden="true" class="spk spk1" width="14" height="14" viewBox="0 0 24 24" fill="#FFF9F2"><path d={sparkle} /></svg>
+        <svg aria-hidden="true" class="spk spk2" width="14" height="14" viewBox="0 0 24 24" fill="#FFF9F2"><path d={sparkle} /></svg>
+      </div>
+      <div class="meta">
+        <div><div class="lbl">TYPE</div><div>2027 UQ Ladies in Technology Membership</div></div>
+        <div class="exp"><div class="lbl">EXPIRY</div><div>31-12-2027</div></div>
+      </div>
+      <div class="barcode">
+        <svg aria-hidden="true" viewBox="0 0 196 52" preserveAspectRatio="none" fill="#111">
+          {bars.map(([x, w]) => <rect x={x} y="0" width={w} height="52" />)}
+        </svg>
+      </div>
+      <div class="glare" aria-hidden="true"></div>
+    </div>
+    <div class="face back">
+      <img src="/assets/logo-lit.png" alt="" />
+      <div class="thanks">Thanks for being part of LIT</div>
+      <div class="hand tag">#women_in_stem</div>
+    </div>
+  </button>
+  <span class="hand hint">tap the card to flip it</span>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.mcard').forEach((card) => {
+    const calm = matchMedia('(prefers-reduced-motion: reduce)');
+    let flipped = false;
+    let rx = 0, ry = 0;
+
+    const apply = () => {
+      card.style.transform = `rotateX(${rx.toFixed(1)}deg) rotateY(${(ry + (flipped ? 180 : 0)).toFixed(1)}deg)`;
+      card.classList.toggle('active', flipped || rx !== 0 || ry !== 0);
+    };
+
+    card.addEventListener('click', () => {
+      flipped = !flipped;
+      card.setAttribute('aria-pressed', String(flipped));
+      apply();
+    });
+
+    card.addEventListener('pointermove', (e) => {
+      if (calm.matches || e.pointerType !== 'mouse') return;
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      rx = (0.5 - py) * 18;
+      ry = (px - 0.5) * 22;
+      card.style.setProperty('--gx', `${Math.round(px * 100)}%`);
+      card.style.setProperty('--gy', `${Math.round(py * 100)}%`);
+      apply();
+    });
+
+    card.addEventListener('pointerleave', () => {
+      rx = 0; ry = 0;
+      apply();
+    });
+  });
+</script>
+
+<style>
+  .mcard-wrap {
+    flex: 1 1 260px;
+    min-width: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 22px;
+    perspective: 1000px;
+  }
+  .mcard {
+    position: relative; display: block;
+    width: 320px; max-width: 100%;
+    border: 0; padding: 0; background: none;
+    color: inherit; font: inherit; text-align: left;
+    cursor: pointer;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.28);
+    rotate: -5deg;
+    transform-style: preserve-3d;
+    transition: transform .22s ease-out, rotate .35s ease-out;
+  }
+  .mcard.active { rotate: 0deg; }
+  .mcard[aria-pressed='true'] { transition: transform .6s cubic-bezier(.3,1.3,.5,1), rotate .35s ease-out; }
+  .mcard:focus-visible { outline: 3px solid var(--cream); outline-offset: 6px; }
+  @media (prefers-reduced-motion: reduce) {
+    .mcard, .mcard[aria-pressed='true'] { transition: none; }
+  }
+
+  .face { border-radius: 22px; border: 1px solid #E58FBF; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .front { position: relative; width: 100%; background: var(--card-pink); color: #2F3556; overflow: hidden; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; }
+  .logo-dot { width: 46px; height: 46px; flex: none; border-radius: 50%; background: rgba(255,255,255,.28); display: flex; align-items: center; justify-content: center; }
+  .logo-dot img { width: 28px; height: 28px; object-fit: contain; filter: brightness(0) invert(1); opacity: .9; }
+  .mtitle { font-size: 20px; }
+
+  .band {
+    position: relative; height: 138px;
+    background: radial-gradient(ellipse at 50% 50%, var(--card-rose) 0%, var(--card-rose) 38%, #E3A4C5 85%, #EDB2D0 100%);
+    border-block: 1px solid rgba(255,255,255,.35);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    color: var(--cream); text-align: center;
+  }
+  .stripe { position: absolute; left: 0; right: 0; height: 5px; background: rgba(255,255,255,.3); }
+  .s1 { top: 8px; } .s2 { bottom: 8px; }
+  .band-logo { width: 22px; height: 22px; object-fit: contain; filter: brightness(0) invert(1); }
+  .ladies { font-family: var(--f-sub); font-size: 26px; letter-spacing: .03em; line-height: 1; }
+  .tech { font-family: var(--f-sub); font-size: 26px; line-height: 1; padding: 8px 18px; border: 1.5px solid rgba(255,255,255,.85); border-radius: 50%; rotate: -3deg; }
+  .spk { position: absolute; }
+  .spk1 { left: 26px; top: 40px; } .spk2 { right: 30px; bottom: 22px; }
+
+  .meta { display: flex; justify-content: space-between; gap: 16px; padding: 14px 18px 0; font-size: 13px; }
+  .meta .exp { flex: none; }
+  .lbl { font-weight: 700; font-size: 12px; letter-spacing: .06em; margin-bottom: 2px; }
+  .barcode { margin: 14px 18px 18px; padding: 14px 16px; background: #fff; border-radius: 8px; }
+  .barcode svg { display: block; width: 100%; height: 52px; }
+
+  .glare {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.8), rgba(255,255,255,0) 55%);
+    mix-blend-mode: soft-light;
+    opacity: 0; transition: opacity .3s;
+  }
+  .mcard:hover .glare { opacity: 1; }
+
+  .back {
+    position: absolute; inset: 0;
+    transform: rotateY(180deg);
+    background: linear-gradient(160deg, var(--card-rose), var(--rose));
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 14px; padding: 24px;
+    color: var(--cream); text-align: center;
+  }
+  .back img { width: 72px; height: 72px; object-fit: contain; filter: brightness(0) invert(1); }
+  .thanks { font-family: var(--f-sub); font-size: 34px; line-height: 1.1; }
+  .tag { font-size: 19px; color: var(--blush-3); }
+  .hint { font-size: 16px; color: var(--blush-3); }
+</style>

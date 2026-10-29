@@ -1,0 +1,57 @@
+---
+import { dateParts, type UqlitEvent } from '../data/events';
+
+interface Props {
+  event: UqlitEvent;
+  index?: number; // drives the alternating tilt/colour
+}
+
+const { event, index = 0 } = Astro.props;
+const { day, month, long } = dateParts(event.date);
+const tilts = ['-2deg', '1.5deg', '-1deg'];
+const Tag = event.rubricUrl ? 'a' : 'article';
+---
+
+<Tag
+  class:list={['ecard', 'rv', 'lift', 'taped', { alt: index % 3 === 1 }]}
+  style={`--d: ${index % 3}; rotate: ${tilts[index % 3]}`}
+  data-date={event.date}
+  href={event.rubricUrl}
+  target={event.rubricUrl ? '_blank' : undefined}
+  rel={event.rubricUrl ? 'noopener' : undefined}
+>
+  <div class="month">{month}</div>
+  <div class="body">
+    <div class="day"><span class="sr-only">{long}</span><span aria-hidden="true">{day}</span></div>
+    <h3>{event.title}</h3>
+    <p>{event.time} · {event.venue}</p>
+    {event.rubricUrl && <span class="tix">Tickets on Rubric ↗</span>}
+  </div>
+</Tag>
+
+<style>
+  .ecard {
+    display: block;
+    flex: 1 1 260px; max-width: 360px;
+    position: relative;
+    background: #fff;
+    border-radius: 10px;
+    overflow: visible;
+    box-shadow: 0 10px 28px rgba(90,50,60,.14);
+  }
+  .ecard.alt { margin-top: 22px; }
+  .month {
+    background: var(--rose); color: #fff;
+    padding: 16px 22px 10px;
+    border-radius: 10px 10px 0 0;
+    font-weight: 700; letter-spacing: .12em; font-size: 13px; text-transform: uppercase;
+  }
+  .alt .month { background: var(--mauve); }
+  .body { padding: 14px 22px 24px; }
+  .day { font-family: var(--f-sub); font-size: 77px; line-height: 1; }
+  h3 { margin: 12px 0 6px; font-size: 20px; }
+  p { margin: 0; color: var(--muted); line-height: 1.5; }
+  .tix { display: inline-block; margin-top: 12px; color: var(--rose); font-weight: 700; font-size: 15px; }
+  a.ecard:hover .tix { text-decoration: underline; }
+  .ecard[hidden] { display: none; }
+</style>
