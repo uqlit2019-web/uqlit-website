@@ -298,31 +298,41 @@ const footerLinks = [
         addEventListener('scroll', () => { if (!bgQueued) { bgQueued = true; requestAnimationFrame(desktopBg); } }, { passive: true });
       }
 
-      // ---------- Home: the dock follows the section you're in ----------
-      // Upcoming events lights the Events tile, Sponsors lights the heart; otherwise LIT.
-      if (onHome) {
-        const spySections: [string, string][] = [['events', 'events'], ['sponsors', 'sponsors']];
+      // ---------- The dock follows the section you're in ----------
+      // Home: Upcoming events lights Events, Sponsors lights the heart.
+      // Any page with a join band (Home, About) lights the Join on Rubric ticket there.
+      // Otherwise the current page's tile stays lit.
+      {
+        const spySections: [string, string][] = [['events', 'events'], ['sponsors', 'sponsors'], ['join', 'join']]
+          .filter(([id]) => document.getElementById(id) && (onHome || id === 'join')) as [string, string][];
         const tiles = new Map([...document.querySelectorAll<HTMLElement>('.dock [data-tile]')].map((t) => [t.dataset.tile!, t]));
-        const dot = document.querySelector<HTMLElement>('#dock-lit .litdot');
-        let current = 'home';
+        // each tile's resting finish: gl (light), gd (dark ticket) or ga (current page)
+        const base = new Map([...tiles].map(([k, t]) => [k, ['ga', 'gd', 'gl'].find((c) => t.classList.contains(c))!]));
+        const home = [...tiles].find(([, t]) => t.classList.contains('ga'))?.[0] ?? 'home';
+        base.set(home, 'gl'); // the current page's tile dims while another one is lit
+        const dot = document.querySelector<HTMLElement>('.dock .litdot');
+        let current = home;
         let spyQueued = false;
         const spy = () => {
           spyQueued = false;
           const line = innerHeight * 0.45;
-          let next = 'home';
+          let next = home;
           for (const [id, tile] of spySections) {
-            const r = document.getElementById(id)?.getBoundingClientRect();
-            if (r && r.top <= line && r.bottom > line) next = tile;
+            const r = document.getElementById(id)!.getBoundingClientRect();
+            if (r.top <= line && r.bottom > line) next = tile;
           }
           if (next === current) return;
-          tiles.get(current)?.classList.replace('ga', 'gl');
+          const prev = tiles.get(current);
+          prev?.classList.replace('ga', base.get(current)!);
           const el = tiles.get(next);
-          el?.classList.replace('gl', 'ga');
+          el?.classList.replace(base.get(next)!, 'ga');
           if (el && dot) el.appendChild(dot);
           current = next;
         };
-        addEventListener('scroll', () => { if (!spyQueued) { spyQueued = true; requestAnimationFrame(spy); } }, { passive: true });
-        spy();
+        if (spySections.length) {
+          addEventListener('scroll', () => { if (!spyQueued) { spyQueued = true; requestAnimationFrame(spy); } }, { passive: true });
+          spy();
+        }
       }
 
       // Links like /#sponsors: the browser jumps while the window is still growing open,
