@@ -1,15 +1,129 @@
 ---
 import Desktop from '../../layouts/Desktop.astro';
+import MemberCard from '../../components/MemberCard.astro';
+import { t3, t6, execs } from '../../data/team';
+
+const t3Tilts = ['-2.5deg', '1.5deg', '-1deg'];
+const t6Tilts = ['2deg', '-2deg', '1deg'];
+
+// Portfolio box colours, in the same order as execs in team.ts
+const boxColours = [
+  { bg: 'var(--blush-3)', ink: 'var(--rose)' },
+  { bg: '#E9DEDE', ink: '#5E4F4F' },
+  { bg: '#FBE9DD', ink: 'var(--rose)' },
+  { bg: '#F3E4E4', ink: 'var(--rose)' },
+];
 ---
 
 <Desktop page="team" title="Team · UQLIT" windowTitle="Meet the team">
-  <section class="placeholder">
-    <p class="hand pop" style="--d: 0">coming soon ♡</p>
-    <h1 class="h1 pop" style="--d: 1">Meet the team</h1>
+  <section class="intro">
+    <div class="hand hi pop" style="--d: 0">the humans behind it</div>
+    <h1 class="title pop" style="--d: 1">Meet the <em>team</em></h1>
+    <p class="pop" style="--d: 2">Volunteers across socials, corporate and marketing who make UQLIT happen.</p>
+  </section>
+
+  <!-- Group photo -->
+  <section class="group">
+    <figure class="crew rv lift taped">
+      <img src="/assets/photo-team.jpg" alt="The UQLIT team posing together with name tags" width="1664" height="944" loading="lazy" class="dev" />
+      <figcaption class="hand">THE CREW</figcaption>
+    </figure>
+  </section>
+
+  <!-- Presidential team -->
+  <section class="tier-sec">
+    <div class="tier rv"><span>Presidential team</span><span class="line"></span></div>
+    <div class="row t3">
+      {t3.map((m, i) => <MemberCard member={m} size="lg" index={i} tilt={t3Tilts[i % 3]} drop={i === 1} />)}
+    </div>
+  </section>
+
+  <!-- Vice presidents -->
+  <section class="tier-sec tinted">
+    <div class="tier rv"><span>Vice presidents</span><span class="line"></span></div>
+    <div class="row t6">
+      {t6.map((m, i) => <MemberCard member={m} size="md" index={i} tilt={t6Tilts[i % 3]} drop={i === 1} />)}
+    </div>
+  </section>
+
+  <!-- Executive team -->
+  <section class="execs">
+    <div class="rv">
+      <h2 class="h2">The executive team</h2>
+      <div class="rule grow" style="margin-bottom: 0"></div>
+    </div>
+    <div class="boxes">
+      {execs.map((group, gi) => {
+        const c = boxColours[gi % boxColours.length];
+        return (
+          <div class="box rv" style={`--d: ${gi}; background: ${c.bg}`}>
+            <h3 class="hand" style={`color: ${c.ink}`}>{group.portfolio}</h3>
+            <ul>
+              {group.members.map((m) => (
+                <li class="person">
+                  {m.photo ? (
+                    <img class="avatar" src={m.photo} alt="" loading="lazy" />
+                  ) : (
+                    <span class="avatar empty" aria-hidden="true">?</span>
+                  )}
+                  <span>
+                    <strong>{m.name}</strong>
+                    <span class="prole">{m.role}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
   </section>
 </Desktop>
 
 <style>
-  .placeholder { padding: clamp(48px, 8vw, 120px) var(--pad-x); min-height: 50vh; }
-  .placeholder .hand { margin: 0 0 18px; font-size: 23px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .intro { padding: clamp(32px, 5vw, 72px) var(--pad-x) clamp(20px, 3vw, 36px); text-align: center; }
+  .hi { font-size: 23px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .title { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(44px, 6vw, 84px); line-height: 1.02; letter-spacing: -0.01em; }
+  .title em { color: var(--rose); font-style: normal; }
+  .intro p { margin: 18px auto 0; max-width: 520px; font-size: 18px; line-height: 1.6; color: var(--muted); }
+
+  .group { padding: 8px var(--pad-x) clamp(28px, 4vw, 48px); display: flex; justify-content: center; }
+  .crew { margin: 0; width: min(760px, 100%); position: relative; background: #fff; padding: 14px 14px 10px; box-shadow: 0 14px 34px rgba(90,50,60,.18); rotate: -1deg; }
+  .crew img { display: block; width: 100%; height: auto; }
+  .crew figcaption { font-size: 22px; text-align: center; padding: 10px 0 4px; }
+
+  .tier-sec { padding: clamp(20px, 3vw, 40px) var(--pad-x) clamp(36px, 5vw, 64px); }
+  .tier-sec.tinted { padding: clamp(36px, 5vw, 64px) var(--pad-x); background: var(--tint); }
+  .tier {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+  }
+  .line { flex-grow: 1; height: 1px; background: rgba(120,106,106,.35); }
+  .row { display: flex; flex-wrap: wrap; justify-content: center; }
+  .t3 { gap: 40px 36px; margin-top: 40px; }
+  .t6 { gap: 36px 30px; margin-top: 36px; }
+
+  .execs { padding: clamp(40px, 6vw, 80px) var(--pad-x) clamp(48px, 6vw, 88px); }
+  /* four portfolios: one row on wide screens, 2×2 in between, stacked on phones */
+  .boxes { display: grid; grid-template-columns: 1fr; gap: 22px; margin-top: 44px; align-items: start; }
+  @media (min-width: 560px) { .boxes { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .boxes { grid-template-columns: repeat(4, 1fr); } }
+  .box { min-width: 0; border-radius: 18px; padding: 24px 22px 20px; }
+  .box h3 { margin: 0; font-size: 23px; }
+  .box ul { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .person {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 12px; border-radius: 12px;
+    background: rgba(255,255,255,.55);
+    transition: translate .25s, background .25s;
+  }
+  .person:hover { translate: 6px 0; background: #fff; }
+  .avatar { width: 46px; height: 46px; flex: none; border-radius: 50%; object-fit: cover; }
+  .avatar.empty {
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--f-sub); font-size: 24px; color: var(--rose);
+  }
+  .person strong { display: block; font-size: 16px; }
+  .prole { font-size: 13px; color: var(--muted); }
 </style>
