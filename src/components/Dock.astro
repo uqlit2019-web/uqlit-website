@@ -31,6 +31,7 @@ const tiles: { key: 'about' | 'team' | 'events' | 'sponsors'; label: string; hre
     <a
       class:list={['dk', 'lit', onHome ? 'ga me' : 'gl']}
       id="dock-lit"
+      data-tile="home"
       href="/"
       data-label="LIT"
       aria-label="LIT, home"
@@ -42,6 +43,7 @@ const tiles: { key: 'about' | 'team' | 'events' | 'sponsors'; label: string; hre
     {tiles.map((t) => (
       <a
         class:list={['dk', t.key === page ? 'ga me' : 'gl']}
+        data-tile={t.key}
         href={t.href}
         data-label={t.label}
         aria-label={t.label}

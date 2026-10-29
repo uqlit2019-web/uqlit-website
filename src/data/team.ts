@@ -14,14 +14,14 @@ export interface Member {
 
 /** T3: the top three roles. */
 export const t3: Member[] = [
-  { name: 'Vanna Ung', role: 'President' },
-  { name: 'Linh Le Do', role: 'Secretary' },
-  { name: 'Ellie Feng', role: 'Treasurer' },
+  { name: 'Vanna Ung', role: 'President', photo: '/assets/team/vanna.jpg' },
+  { name: 'Linh Le Do', role: 'Secretary', photo: '/assets/team/linh.jpg' },
+  { name: 'Ellie Feng', role: 'Treasurer', photo: '/assets/team/ellie.jpg' },
 ];
 
 /** T6: the vice presidents. */
 export const t6: Member[] = [
-  { name: 'Vaishnavi Ganachari', role: 'Socials VP' },
+  { name: 'Vaishnavi Ganachari', role: 'Socials VP', photo: '/assets/team/vaishnavi.jpg' },
   { name: 'Clare Johnston', role: 'Corporate VP' },
   { name: 'Jasmin Soon', role: 'Marketing VP' },
 ];
