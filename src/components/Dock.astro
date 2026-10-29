@@ -76,6 +76,9 @@ const tiles: { key: 'about' | 'team' | 'events' | 'sponsors'; label: string; hre
     pointer-events: auto;
     display: flex; align-items: flex-end; gap: var(--gap);
     padding: 12px 18px;
+    /* Fixed height (one resting tile + padding + border): magnified tiles rise out of the
+       top of the dock instead of making it taller */
+    height: calc(var(--tile) + 26px);
     border-radius: 34px;
     background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.2));
     backdrop-filter: blur(24px) saturate(1.9) brightness(1.06);
