@@ -1,15 +1,323 @@
 ---
 import Desktop from '../../layouts/Desktop.astro';
+import MemberCard from '../../components/MemberCard.astro';
+import { RUBRIC_MEMBERSHIP_URL } from '../../data/site';
+import { t3 } from '../../data/team';
+
+const timeline = [
+  { year: '2019', text: 'UQLIT is founded' },
+  { year: '2022', text: 'EAIT Club of the Year winners' },
+  { year: '2025', text: 'EAIT Club of the Year winners, again' },
+  { year: '2026', text: '352 members, entering our 9th year' },
+];
+
+const activities = [
+  { title: 'Sponsor panels', text: 'Industry partners share their stories with members.', tilt: '-2deg' },
+  { title: 'Mentorship Program', text: 'Pairing members with mentors who have been there.', tilt: '1.5deg' },
+  { title: 'LIT Gala', text: 'Our flagship night of the year.', tilt: '-1deg', flagship: true },
+  { title: 'High Frequency Networking', text: 'Our flagship networking night: a relaxed way to meet industry partners and each other.', tilt: '2deg', flagship: true },
+];
+
+const pillarIcons = {
+  community: '<circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 14.2c3 0 5.5 1.8 5.5 4.8"/>',
+  confidence: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  industry: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/>',
+};
+const pillars = [
+  { icon: pillarIcons.community, title: 'Community', text: 'Find your first mentors and your closest friends, in a place where you belong.', tilt: '-2deg' },
+  { icon: pillarIcons.confidence, title: 'Confidence', text: 'Feel seen, valued and encouraged to explore your potential.', tilt: '1.5deg', pink: true },
+  { icon: pillarIcons.industry, title: 'Industry', text: 'Connect with industry and learn from our industry representatives.', tilt: '-1deg' },
+];
+
+// The top three (President, Secretary, Treasurer)
+const teaser = t3;
+const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
 ---
 
 <Desktop page="about" title="About · UQLIT" windowTitle="About">
-  <section class="placeholder">
-    <p class="hand pop" style="--d: 0">coming soon ♡</p>
-    <h1 class="h1 pop" style="--d: 1">More than a society.</h1>
+  <!-- Who we are -->
+  <section class="who">
+    <div class="who-copy">
+      <div class="hand hi pop" style="--d: 0">a little about us</div>
+      <h1 class="title pop" style="--d: 1">More than a society. A place to <em>belong</em>.</h1>
+      <p class="pop" style="--d: 2">UQLIT is a supportive community for women in tech at the University of Queensland. In a male-dominated industry, we know how important it is for members to feel seen, valued and encouraged to explore their potential.</p>
+      <p class="pop muted" style="--d: 3">Many of our members find their first mentors, their confidence, and their closest friends here, and that support carries them well beyond university.</p>
+    </div>
+    <div class="collage">
+      <div class="blob pop" style="--d: 1"></div>
+      <div class="flt c-photo" style="--y: 26px">
+        <figure class="polaroid pop lift taped" style="--d: 2">
+          <img src="/assets/photo-hug.png" alt="Two UQLIT members sharing a hug at an event" width="596" height="332" />
+          <figcaption class="hand">THIS IS WHAT IT'S ABOUT</figcaption>
+        </figure>
+      </div>
+      <div class="flt c-logo" style="--y: 54px">
+        <div class="logo-sticker pop lift" style="--d: 4"><img src="/assets/logo-lit.png" alt="UQLIT lightbulb logo" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our story + receipt timeline -->
+  <section class="story">
+    <div class="story-copy rv">
+      <h2 class="h2">Our story</h2>
+      <div class="rule grow"></div>
+      <p>Founded in 2019, UQLIT has grown rapidly into one of UQ's most active technology societies, attracting <strong>352 members</strong> this year. We have been nominated three times for <strong>EAIT Club of the Year</strong> and are proud to have won the award in both 2022 and 2025. As we enter our 9th year, our mission remains rooted in empowering women in STEM, while expanding to uplift all diverse communities.</p>
+      <p class="deep">Together with our partners, we hosted more than a dozen career development and community-building events this year, from <strong>sponsor panels and our Mentorship Program to our flagship LIT Gala and High Frequency Networking</strong>. These collaborations connected hundreds of students with mentors and industry opportunities, helping <strong>bridge the gap between university and the tech workforce</strong>.</p>
+    </div>
+
+    <div class="printer rv" style="--d: 2">
+      <div class="slot" aria-hidden="true"><div class="slot-gap"></div></div>
+      <div class="rcp" id="receipt">
+        <div class="feed">
+        <div class="receipt">
+          <div class="r-head">
+            <img src="/assets/logo-lit.png" alt="" />
+            <div class="r-name">UQLIT</div>
+            <div class="r-sub">UQ LADIES IN TECHNOLOGY</div>
+          </div>
+          <div class="dash" aria-hidden="true"></div>
+          <h3>OUR TIMELINE</h3>
+          <ol class="r-rows">
+            {timeline.map((t) => (
+              <li class="rc-row">
+                <span class="yr">{t.year}</span>
+                <span class="dots" aria-hidden="true"></span>
+                <span class="what">{t.text}</span>
+              </li>
+            ))}
+          </ol>
+          <div class="dash" aria-hidden="true"></div>
+          <div class="total"><span>MEMBERS</span><span>352</span></div>
+          <div class="subtotal"><span>CLUB OF THE YEAR WINS</span><span>2</span></div>
+          <div class="dash" aria-hidden="true"></div>
+          <div class="thanks">THANK YOU FOR BEING HERE</div>
+          <div class="r-bar" aria-hidden="true"></div>
+          <div class="hand r-note">see you at the next one!</div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What we get up to -->
+  <section class="activities">
+    <div class="rv">
+      <div class="hand kicker">a dozen-plus events a year</div>
+      <h2 class="h2 h2-sm">What we get up to</h2>
+    </div>
+    <div class="act-grid">
+      {activities.map((a, i) => (
+        <div class:list={['act', 'rv', 'lift', 'taped', { flagship: a.flagship }]} style={`--d: ${i}; rotate: ${a.tilt}`}>
+          {a.flagship && <div class="hand flag">flagship</div>}
+          <h3>{a.title}</h3>
+          <p>{a.text}</p>
+        </div>
+      ))}
+    </div>
+    <div class="act-photos">
+      <figure class="polaroid rv lift taped" style="--d: 0; rotate: -1.5deg">
+        <img src="/assets/photo-panel.jpg" alt="A panel of speakers at the LIT Gala addressing a full room" loading="lazy" class="dev" />
+        <figcaption class="hand">LIT GALA</figcaption>
+      </figure>
+      <figure class="polaroid rv lift taped" style="--d: 1; rotate: 1.5deg">
+        <img src="/assets/photo-network.jpg" alt="Students and industry guests mingling at a networking night" loading="lazy" class="dev" />
+        <figcaption class="hand">HIGH FREQUENCY NETWORKING</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- What you'll find here -->
+  <section class="find">
+    <div class="rv narrow">
+      <h2 class="h2">What you'll find here</h2>
+      <div class="rule grow" style="margin-bottom: 0"></div>
+    </div>
+    <div class="pillars">
+      {pillars.map((p, i) => (
+        <div class:list={['pillar', 'rv', 'lift', 'taped', { pink: p.pink }]} style={`--d: ${i}; rotate: ${p.tilt}`}>
+          <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B8405F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" set:html={p.icon} />
+          <h3>{p.title}</h3>
+          <p>{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Team teaser -->
+  <section class="team">
+    <div class="rv narrow">
+      <div class="hand kicker">say hi to</div>
+      <h2 class="h2">The team</h2>
+      <a class="btn btn-outline small" href="/team/">Meet the whole team →</a>
+    </div>
+    <div class="team-grid">
+      {teaser.map((m, i) => <MemberCard member={m} size="sm" index={i} tilt={teaserTilts[i]} drop={i % 2 === 1} />)}
+    </div>
+  </section>
+
+  <!-- Join -->
+  <section class="join" id="join">
+    <div class="join-band rv">
+      <div>
+        <div class="hand join-kicker">there's a seat for you</div>
+        <h2>Join UQLIT today</h2>
+      </div>
+      <a class="btn join-btn" href={RUBRIC_MEMBERSHIP_URL} target="_blank" rel="noopener">Join on Rubric <span aria-hidden="true">↗</span></a>
+    </div>
   </section>
 </Desktop>
 
 <style>
-  .placeholder { padding: clamp(48px, 8vw, 120px) var(--pad-x); min-height: 50vh; }
-  .placeholder .hand { margin: 0 0 18px; font-size: 23px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .kicker { font-size: 21px; color: var(--rose); rotate: -2deg; display: inline-block; }
+  .narrow { max-width: 640px; }
+  .btn.small { min-height: 46px; padding: 0 22px; margin-top: 18px; }
+
+  /* ---------- Who we are ---------- */
+  .who { display: flex; flex-wrap: wrap; align-items: center; gap: 40px 56px; padding: clamp(32px, 5vw, 72px) var(--pad-x); }
+  .who-copy { flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+  .hi { font-size: 23px; color: var(--rose); rotate: -2deg; align-self: flex-start; }
+  .title { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(42px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.01em; }
+  .title em { color: var(--rose); font-style: normal; }
+  .who-copy p { margin: 0; font-size: 18px; line-height: 1.7; }
+  .who-copy p.muted { color: var(--muted); }
+
+  .collage { flex: 1 1 340px; min-width: 0; position: relative; height: 460px; max-width: 500px; margin: 0 auto; }
+  .blob { position: absolute; inset: 24px 0 10px 20px; border-radius: 52% 48% 46% 54% / 46% 54% 46% 54%; background: var(--blush-2); }
+  .c-photo { position: absolute; left: 20px; top: 40px; }
+  .c-logo { position: absolute; left: 0; bottom: 30px; }
+  .collage .polaroid { width: 340px; padding: 14px 14px 16px; box-shadow: 0 14px 34px rgba(90,50,60,.2); rotate: 4deg; }
+  .collage .polaroid img { height: 230px; object-position: 60% 40%; }
+  .collage .polaroid figcaption { font-size: 21px; padding-top: 10px; }
+  .logo-sticker {
+    width: 112px; height: 112px; border-radius: 50%;
+    background: var(--cream); border: 4px solid #fff;
+    box-shadow: 0 10px 26px rgba(90,50,60,.22);
+    display: flex; align-items: center; justify-content: center;
+    rotate: -8deg;
+  }
+  .logo-sticker img { width: 72px; height: 72px; object-fit: contain; }
+  @media (max-width: 480px) {
+    .collage { height: 380px; }
+    .c-photo { left: 0; }
+    .collage .polaroid { width: 260px; }
+    .collage .polaroid img { height: 180px; }
+    .logo-sticker { width: 88px; height: 88px; }
+    .logo-sticker img { width: 56px; height: 56px; }
+  }
+
+  .polaroid { margin: 0; position: relative; background: #fff; }
+  .polaroid img { display: block; width: 100%; object-fit: cover; }
+  .polaroid figcaption { font-size: 20px; text-align: center; padding: 10px 0 4px; color: var(--ink); }
+
+  /* ---------- Story + receipt ---------- */
+  .story { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 44px 64px; padding: clamp(40px, 6vw, 80px) var(--pad-x) clamp(24px, 4vw, 48px); }
+  .story-copy { flex: 1.4 1 420px; min-width: 0; }
+  .story-copy p { margin: 0 0 20px; font-size: 18px; line-height: 1.7; }
+  .story-copy p.deep { margin: 0; color: #4A3C3C; }
+
+  .printer { flex: 1 1 300px; max-width: 380px; margin: 0 auto; min-width: 0; }
+  .slot { height: 26px; border-radius: 14px; background: linear-gradient(180deg, #8E7C7C, #5A4A4A); box-shadow: 0 6px 16px rgba(60,30,40,.3); position: relative; z-index: 2; }
+  .slot-gap { position: absolute; left: 14px; right: 14px; bottom: 5px; height: 6px; border-radius: 4px; background: #241A1A; }
+  /* .rcp clips at the printer slot; the padding leaves room for the shadow */
+  .rcp { margin: 0 -2px -30px; padding: 0 20px 30px; position: relative; z-index: 1; overflow: hidden; }
+  .feed { filter: drop-shadow(0 12px 14px rgba(90,50,60,.2)); }
+  .receipt {
+    background: #fff;
+    padding: 26px 24px 34px;
+    color: var(--ink);
+    font-family: var(--f-mono);
+    /* zig-zag torn bottom edge */
+    -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%;
+    mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%;
+  }
+  .r-head { text-align: center; }
+  .r-head img { width: 44px; height: 44px; object-fit: contain; }
+  .r-name { font-size: 18px; font-weight: 500; letter-spacing: .14em; margin-top: 6px; }
+  .r-sub { font-size: 11px; letter-spacing: .1em; color: var(--mauve); margin-top: 4px; }
+  .dash { border-top: 2px dashed #8A7A7A; margin: 16px 0 14px; }
+  .receipt h3 { margin: 0 0 14px; font-family: var(--f-mono); font-size: 13px; font-weight: 500; letter-spacing: .12em; }
+  .r-rows { list-style: none; margin: 0; padding: 0; }
+  .rc-row { display: flex; align-items: baseline; gap: 6px; font-size: 14px; line-height: 1.35; margin-bottom: 14px; transition: translate .2s; }
+  .rc-row:hover { translate: 4px 0; }
+  .yr { flex: none; font-weight: 500; }
+  .dots { flex: 1; border-bottom: 2px dotted #8A7A7A; translate: 0 -3px; min-width: 12px; }
+  .what { flex: none; text-align: right; max-width: 58%; }
+  .total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 500; }
+  .subtotal { display: flex; justify-content: space-between; font-size: 13px; color: var(--mauve); margin-top: 4px; }
+  .thanks { text-align: center; font-size: 12px; letter-spacing: .1em; }
+  .r-bar {
+    height: 38px; margin: 14px auto 0; max-width: 220px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px, var(--ink) 4px 5px, transparent 5px 9px, var(--ink) 9px 12px, transparent 12px 14px);
+  }
+  .r-note { text-align: center; font-size: 19px; color: var(--rose); margin-top: 12px; rotate: -2deg; }
+
+  /* ---------- Activities ---------- */
+  .activities { padding: clamp(24px, 4vw, 48px) var(--pad-x) clamp(44px, 6vw, 80px); }
+  .h2-sm { font-size: clamp(30px, 4vw, 44px); }
+  /* 4 across, 2×2, or stacked, so a card is never left alone on a row */
+  .act-grid { display: grid; grid-template-columns: 1fr; gap: 30px 26px; margin-top: 40px; }
+  @media (min-width: 560px) { .act-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .act-grid { grid-template-columns: repeat(4, 1fr); } }
+  .act { position: relative; background: #fff; border-radius: 6px; padding: 36px 24px 26px; box-shadow: 0 8px 24px rgba(90,50,60,.12); }
+  .act.flagship { background: var(--blush-3); }
+  .flag { font-size: 17px; color: var(--rose); margin-bottom: 2px; }
+  .act h3 { margin: 0 0 8px; font-family: var(--f-sub); font-weight: 400; font-size: 31px; line-height: 1.1; }
+  .act p { margin: 0; line-height: 1.6; color: #5A4A4A; }
+  .act-photos { display: flex; flex-wrap: wrap; gap: 36px 28px; margin-top: 56px; align-items: flex-start; }
+  .act-photos .polaroid { flex: 1.4 1 380px; min-width: 0; padding: 12px 12px 8px; box-shadow: 0 10px 28px rgba(90,50,60,.16); }
+  .act-photos img { height: 280px; }
+  @media (max-width: 480px) { .act-photos img { height: 220px; } }
+
+  /* ---------- Pillars ---------- */
+  .find { padding: clamp(40px, 6vw, 80px) var(--pad-x); background: var(--tint); }
+  .pillars { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 44px; }
+  .pillar { flex: 1 1 240px; position: relative; background: #fff; border-radius: 6px; padding: 36px 26px 30px; box-shadow: 0 8px 24px rgba(90,50,60,.12); }
+  .pillar.pink { background: var(--blush-3); margin-top: 16px; }
+  .pillar h3 { margin: 12px 0 8px; font-family: var(--f-sub); font-weight: 400; font-size: 34px; }
+  .pillar p { margin: 0; line-height: 1.6; color: var(--muted); }
+  .pillar.pink p { color: #5A4A4A; }
+
+  /* ---------- Team teaser ---------- */
+  .team { padding: clamp(44px, 6vw, 84px) var(--pad-x); }
+  .team-grid { display: grid; grid-template-columns: minmax(0, 280px); justify-content: center; gap: 34px 26px; margin-top: 44px; align-items: start; }
+  @media (min-width: 560px) { .team-grid { grid-template-columns: repeat(3, minmax(0, 280px)); } }
+
+  /* ---------- Join ---------- */
+  .join { padding: 0 var(--pad-x) clamp(48px, 6vw, 84px); scroll-margin-top: 40px; }
+  .join-band {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 24px 40px;
+    background: var(--rose); color: var(--cream);
+    border-radius: 28px;
+    padding: clamp(28px, 4vw, 52px);
+    box-shadow: 0 18px 0 rgba(90,40,55,.16);
+  }
+  .join-band > div { flex: 1 1 320px; min-width: 0; }
+  .join-kicker { font-size: 21px; color: var(--blush-3); }
+  .join-band h2 { margin: 0; font-family: var(--f-head); font-weight: 400; font-size: clamp(32px, 4vw, 52px); line-height: 1.05; }
+  .join-btn { min-height: 54px; padding: 0 30px; background: var(--cream); color: #8E2F48; font-size: 17px; box-shadow: 0 6px 0 rgba(0,0,0,.2); }
+
+  /* Receipt feeds out of the slot, line by line, once you reach it (classes set by the script below) */
+  .rcp.will-print .feed { translate: 0 -100%; }
+  .rcp.printing .feed { animation: feed 2.6s steps(26, end) forwards; }
+  @keyframes feed { from { translate: 0 -100%; } to { translate: 0 0; } }
+  .printer:has(.printing) .slot { animation: buzz .1s linear 26; }
+  @keyframes buzz { 50% { translate: .6px 0; } }
 </style>
+
+<script>
+  const receipt = document.getElementById('receipt');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (receipt && !calm && 'IntersectionObserver' in window) {
+    receipt.classList.add('will-print');
+    // Start once the printer is about a third of the way up the screen.
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        receipt.classList.add('printing');
+        io.disconnect();
+      }
+    }, { rootMargin: '0px 0px -30% 0px' });
+    io.observe(receipt.previousElementSibling ?? receipt);
+  }
+</script>
