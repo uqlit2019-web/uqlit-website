@@ -12,7 +12,7 @@ interface Props {
 const { member, size = 'sm', index = 0, tilt = '0deg', drop = false } = Astro.props;
 ---
 
-<figure class:list={['member', size, 'rv', 'lift', 'taped', { drop, alt: index % 2 === 1 }]} style={`--d: ${index % 4}; rotate: ${tilt}`}>
+<figure class:list={['member', size, 'fall', 'lift', 'taped', { drop, alt: index % 2 === 1 }]} style={`--d: ${index % 4}; rotate: ${tilt}`}>
   {member.photo ? (
     <img class="photo dev" src={member.photo} alt={member.name} loading="lazy" />
   ) : (
