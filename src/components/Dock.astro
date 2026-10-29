@@ -55,7 +55,7 @@ const tiles: { key: 'about' | 'team' | 'events' | 'sponsors'; label: string; hre
       </a>
     ))}
     <span class="sep" aria-hidden="true"></span>
-    <a class="dk gd" href={joinHref} target="_blank" rel="noopener" data-label="Join on Rubric" aria-label="Join on Rubric">
+    <a class="dk gd" data-tile="join" href={joinHref} target="_blank" rel="noopener" data-label="Join on Rubric" aria-label="Join on Rubric">
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" set:html={icons.join} />
     </a>
   </nav>
