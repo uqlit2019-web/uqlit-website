@@ -1,5 +1,5 @@
 ---
-import type { Member } from '../data/team';
+import { initials, type Member } from '../data/team';
 
 interface Props {
   member: Member;
@@ -16,7 +16,7 @@ const { member, size = 'sm', index = 0, tilt = '0deg', drop = false } = Astro.pr
   {member.photo ? (
     <img class="photo dev" src={member.photo} alt={member.name} loading="lazy" />
   ) : (
-    <div class="photo empty" aria-hidden="true">?</div>
+    <div class="photo empty" aria-hidden="true">{initials(member.name)}</div>
   )}
   <figcaption>
     <div class="hand name">{member.name}</div>
