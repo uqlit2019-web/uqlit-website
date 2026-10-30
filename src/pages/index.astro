@@ -81,7 +81,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
       <div class="blob pop" style="--d: 1"></div>
       <div class="flt c-photo" style="--y: 30px">
         <figure class="polaroid pop lift taped" style="--d: 2">
-          <img src="/assets/events/hfn10.jpg" alt="Two UQLIT members sharing a hug at High Frequency Networking" width="1600" height="1067" />
+          <img src="/assets/events/hero-group.jpg" alt="A group of UQLIT members smiling together at the Resume Building workshop" width="1200" height="870" />
           <figcaption class="hand">CLOSEST FRIENDS FOUND HERE</figcaption>
         </figure>
       </div>
@@ -199,9 +199,13 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
         }
       }
     }, { threshold: 0.6 });
+    // Wait until the window has finished opening (see Desktop.astro), or every counter
+    // would look "on screen" while the page is still shrunk inside the opening animation.
+    const whenOpen = (fn: () => void) =>
+      document.documentElement.dataset.winOpen ? fn() : addEventListener('uqlit:window-open', fn, { once: true });
     counters.forEach((el) => {
       show(el, Number(el.dataset.from) || 0);
-      io.observe(el);
+      whenOpen(() => io.observe(el));
       el.addEventListener('mouseenter', () => run(el));
       el.addEventListener('focus', () => run(el));
     });
@@ -251,7 +255,7 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
   .c-note { position: absolute; right: 0; bottom: 22px; }
   .c-spark { position: absolute; left: 0; bottom: 40px; width: 70px; height: 70px; }
   .collage .polaroid { width: 290px; padding: 12px 12px 14px; box-shadow: 0 14px 34px rgba(90,50,60,.2); rotate: -5deg; }
-  .collage .polaroid img { height: 210px; object-position: 52% 30%; }
+  .collage .polaroid img { height: auto; aspect-ratio: 1200 / 870; } /* the photo's own shape: nothing cropped */
   .logo-sticker {
     width: 118px; height: 118px; border-radius: 50%;
     background: var(--cream); border: 4px solid #fff;
@@ -273,7 +277,6 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
   @media (max-width: 480px) {
     .collage { height: 400px; }
     .collage .polaroid { width: 240px; }
-    .collage .polaroid img { height: 170px; }
     .c-photo { left: 0; }
     .logo-sticker { width: 92px; height: 92px; }
     .logo-sticker img { width: 58px; height: 58px; }
