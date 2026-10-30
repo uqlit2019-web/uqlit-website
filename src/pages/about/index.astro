@@ -324,6 +324,10 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
         io.disconnect();
       }
     }, { rootMargin: '0px 0px -30% 0px' });
-    io.observe(receipt.previousElementSibling ?? receipt);
+    // Wait until the window has finished opening (see Desktop.astro), or the printer would look
+    // "on screen" while the page is still shrunk inside the opening animation and print unseen.
+    const watch = () => io.observe(receipt.previousElementSibling ?? receipt);
+    if (document.documentElement.dataset.winOpen) watch();
+    else addEventListener('uqlit:window-open', watch, { once: true });
   }
 </script>

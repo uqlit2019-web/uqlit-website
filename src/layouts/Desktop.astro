@@ -224,6 +224,28 @@ const footerLinks = [
         if (stickers.length > 10) stickers.shift()!.remove();
       });
 
+      // ---------- "Window is open" signal ----------
+      // While the window grows open out of the dock, the whole page is shrunk into a tiny box on
+      // screen, so anything watching for "scrolled into view" would fire for everything at once
+      // (counting the numbers, dropping the polaroids, printing the receipt) before anyone sees it.
+      // Scroll-triggered effects wait for this signal instead.
+      const root = document.documentElement;
+      const markOpen = () => {
+        if (root.dataset.winOpen) return;
+        root.dataset.winOpen = '1';
+        dispatchEvent(new Event('uqlit:window-open'));
+      };
+      if (win.getAnimations().length) {
+        win.addEventListener('animationend', (e) => { if (e.target === win) markOpen(); });
+        setTimeout(markOpen, 4500); // safety net, in case the animation never reports finishing
+      } else {
+        markOpen();
+      }
+      const whenWindowOpen = (fn: () => void) => {
+        if (root.dataset.winOpen) fn();
+        else addEventListener('uqlit:window-open', fn, { once: true });
+      };
+
       // ---------- Scroll effects (work in every browser) ----------
       if (document.documentElement.classList.contains('anim')) {
         // Reveal cards and photos, develop photos and grow underlines as they come into view
@@ -251,7 +273,6 @@ const footerLinks = [
         });
 
         let pending = [...document.querySelectorAll<HTMLElement>('.rv, .dev, .grow, .fall, .stamp, .write')];
-        pending.forEach((el) => reveal.observe(el));
 
         // A fast jump (section link, End key) can skip right past an element without it ever
         // crossing the screen, so also reveal anything that's already above the bottom of the screen.
@@ -268,7 +289,12 @@ const footerLinks = [
             return true;
           });
         };
-        addEventListener('scroll', () => { if (!sweepQueued && pending.length) { sweepQueued = true; requestAnimationFrame(sweep); } }, { passive: true });
+        // Start watching only once the window is fully open (see the signal above)
+        whenWindowOpen(() => {
+          pending.forEach((el) => reveal.observe(el));
+          sweep();
+          addEventListener('scroll', () => { if (!sweepQueued && pending.length) { sweepQueued = true; requestAnimationFrame(sweep); } }, { passive: true });
+        });
 
         // Floating stickers drift up as you scroll past (down by --y at the bottom of the screen, up by --y at the top)
         const floaters = [...document.querySelectorAll<HTMLElement>('.flt')];
