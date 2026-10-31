@@ -133,12 +133,13 @@ img { max-width: 100%; }
 
   /* .flt (floating hero stickers) drift with scroll; moved by the layout script */
 
-  /* .fall: a few chosen polaroids drop in crooked, settle, then get taped down */
+  /* .fall: polaroids drop in crooked, settle, then get taped down, one after another
+     left to right along each row (--d is the place in the row, set in Desktop.astro) */
   html.anim .fall:not(.in) { opacity: 0; }
-  html.anim .fall.in { animation: fall 1s cubic-bezier(.25,1.3,.5,1) both; animation-delay: calc(var(--d, 0) * 90ms); }
+  html.anim .fall.in { animation: fall 1s cubic-bezier(.25,1.3,.5,1) both; animation-delay: calc(var(--d, 0) * 450ms); }
   @keyframes fall { 0% { opacity: 0; transform: translateY(-90px) rotate(-9deg) scale(1.05); } 45% { opacity: 1; } 100% { opacity: 1; transform: none; } }
   html.anim .fall.taped:not(.in)::before { scale: 0 1; }
-  html.anim .fall.taped.in::before { transform-origin: left center; animation: tape .35s ease-out both; animation-delay: calc(var(--d, 0) * 90ms + .85s); }
+  html.anim .fall.taped.in::before { transform-origin: left center; animation: tape .35s ease-out both; animation-delay: calc(var(--d, 0) * 450ms + .85s); }
   @keyframes tape { from { scale: 0 1; opacity: .4; } to { scale: 1 1; opacity: 1; } }
 
   /* .stamp: sponsor logos stamp down one by one */

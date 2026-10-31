@@ -182,26 +182,40 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
     const show = (el: HTMLElement, n: number) => {
       el.querySelector('.cnt-val')!.textContent = `${n}${el.dataset.suf ?? ''}`;
     };
+    // Each counter's current count-up, so starting a new one (or resetting) stops the old one
+    const runs = new WeakMap<HTMLElement, number>();
     const run = (el: HTMLElement) => {
       const from = Number(el.dataset.from) || 0;
       const to = Number(el.dataset.to) || 0;
       const start = performance.now();
       const dur = 1400;
+      const id = (runs.get(el) ?? 0) + 1;
+      runs.set(el, id);
       const tick = (now: number) => {
+        if (runs.get(el) !== id) return;
         const t = Math.min(1, (now - start) / dur);
         show(el, Math.round(from + (to - from) * (1 - Math.pow(1 - t, 3))));
         if (t < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
     };
+    const reset = (el: HTMLElement) => {
+      runs.set(el, (runs.get(el) ?? 0) + 1);
+      show(el, Number(el.dataset.from) || 0);
+    };
+    // Count up each time a counter comes into view; reset once it has scrolled off screen
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
-        if (e.isIntersecting) {
-          run(e.target as HTMLElement);
-          io.unobserve(e.target);
+        const el = e.target as HTMLElement;
+        if (e.intersectionRatio >= 0.6 && !el.dataset.counted) {
+          el.dataset.counted = '1';
+          run(el);
+        } else if (!e.isIntersecting && el.dataset.counted) {
+          delete el.dataset.counted;
+          reset(el);
         }
       }
-    }, { threshold: 0.6 });
+    }, { threshold: [0, 0.6] });
     // Wait until the window has finished opening (see Desktop.astro), or every counter
     // would look "on screen" while the page is still shrunk inside the opening animation.
     const whenOpen = (fn: () => void) =>

@@ -12,11 +12,25 @@ const timeline = [
   { year: '2026', text: '352 members, entering our 9th year' },
 ];
 
-const activities = [
-  { title: 'Sponsor panels', text: 'Industry partners share their stories with members.', tilt: '-2deg' },
-  { title: 'Mentorship Program', text: 'Pairing members with mentors who have been there.', tilt: '1.5deg' },
-  { title: 'LIT Gala', text: 'Our flagship night of the year.', tilt: '-1deg', flagship: true },
-  { title: 'High Frequency Networking', text: 'Our flagship networking night: a relaxed way to meet industry partners and each other.', tilt: '2deg', flagship: true },
+const activityGroups = [
+  {
+    label: 'Social events',
+    items: [
+      { title: 'Launch Picnic', text: 'Kick off the semester on the grass with snacks, games and new faces.', tilt: '1.5deg' },
+      { title: 'Trivia Night', text: 'Grab a team for a night of questions and friendly competition.', tilt: '-2deg' },
+      { title: "Paint 'n' Sip", text: 'Brushes, drinks and plenty of laughs. No art skills needed.', tilt: '1deg' },
+      { title: 'Slime Making', text: 'Get messy, get creative and take home something squishy.', tilt: '-1.5deg' },
+    ],
+  },
+  {
+    label: 'Corporate events',
+    items: [
+      { title: 'Sponsor panels', text: 'Industry partners share their stories with members.', tilt: '-2deg' },
+      { title: 'Mentorship Program', text: 'Pairing members with mentors who have been there.', tilt: '1.5deg' },
+      { title: 'LIT Gala', text: 'Our flagship night of the year.', tilt: '-1deg', flagship: true },
+      { title: 'High Frequency Networking', text: 'Our flagship networking night: a relaxed way to meet industry partners and each other.', tilt: '2deg', flagship: true },
+    ],
+  },
 ];
 
 const pillarIcons = {
@@ -104,30 +118,35 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
   <!-- What we get up to -->
   <section class="activities">
     <div class="rv">
-      <div class="hand kicker">a dozen-plus events a year</div>
+      <div class="hand kicker">25+ events a year</div>
       <h2 class="h2 h2-sm">What we get up to</h2>
     </div>
-    <div class="act-grid">
-      {activities.map((a, i) => (
-        <div class:list={['act', 'rv', 'lift', 'taped', { flagship: a.flagship }]} style={`--d: ${i}; rotate: ${a.tilt}`}>
-          {a.flagship && <div class="hand flag">flagship</div>}
-          <h3>{a.title}</h3>
-          <p>{a.text}</p>
+    {activityGroups.map((g) => (
+      <>
+        <div class="act-type rv"><span>{g.label}</span><span class="line"></span></div>
+        <div class="act-grid">
+          {g.items.map((a, i) => (
+            <div class:list={['act', 'rv', 'lift', 'taped', { flagship: a.flagship }]} style={`--d: ${i}; rotate: ${a.tilt}`}>
+              {a.flagship && <div class="hand flag">flagship</div>}
+              <h3>{a.title}</h3>
+              <p>{a.text}</p>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </>
+    ))}
     <div class="act-photos">
       <figure class="polaroid fall lift taped" style="--d: 0; rotate: -1.5deg">
         <img src="/assets/events/litgala18.jpg" alt="A speaker with a microphone talking to members at the LIT Gala" loading="lazy" class="dev" />
         <figcaption class="hand">LIT GALA</figcaption>
       </figure>
       <figure class="polaroid fall lift taped" style="--d: 1; rotate: 1.5deg">
-        <img src="/assets/events/hfn5.jpg" alt="A group of members dressed up at High Frequency Networking" loading="lazy" class="dev" />
-        <figcaption class="hand">HIGH FREQUENCY NETWORKING</figcaption>
+        <img src="/assets/events/trivia1.jpg" alt="Members playing in teams at UQLIT Trivia Night" loading="lazy" class="dev" />
+        <figcaption class="hand">TRIVIA NIGHT</figcaption>
       </figure>
       <figure class="polaroid fall lift taped" style="--d: 2; rotate: -1deg">
-        <img src="/assets/events/mentorship1.jpg" alt="A mentor and a member talking at a table during the Mentorship Program" loading="lazy" class="dev" />
-        <figcaption class="hand">MENTORSHIP PROGRAM</figcaption>
+        <img src="/assets/events/hfn5.jpg" alt="A group of members dressed up at High Frequency Networking" loading="lazy" class="dev" />
+        <figcaption class="hand">HIGH FREQUENCY NETWORKING</figcaption>
       </figure>
     </div>
   </section>
@@ -265,7 +284,14 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
   .activities { padding: clamp(24px, 4vw, 48px) var(--pad-x) clamp(44px, 6vw, 80px); }
   .h2-sm { font-size: clamp(30px, 4vw, 44px); }
   /* 4 across, 2×2, or stacked, so a card is never left alone on a row */
-  .act-grid { display: grid; grid-template-columns: 1fr; gap: 30px 26px; margin-top: 40px; }
+  .act-grid { display: grid; grid-template-columns: 1fr; gap: 30px 26px; margin-top: 30px; }
+  /* Social / Corporate row labels */
+  .act-type {
+    display: flex; align-items: center; gap: 14px; margin-top: 40px;
+    font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+  }
+  .act-grid + .act-type { margin-top: 52px; }
+  .act-type .line { flex-grow: 1; height: 1px; background: rgba(120,106,106,.35); }
   @media (min-width: 560px) { .act-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 1100px) { .act-grid { grid-template-columns: repeat(4, 1fr); } }
   .act { position: relative; background: #fff; border-radius: 6px; padding: 36px 24px 26px; box-shadow: 0 8px 24px rgba(90,50,60,.12); }
@@ -311,8 +337,6 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
   .rcp.will-print .feed { translate: 0 -100%; }
   .rcp.printing .feed { animation: feed 2.6s steps(26, end) forwards; }
   @keyframes feed { from { translate: 0 -100%; } to { translate: 0 0; } }
-  .printer:has(.printing) .slot { animation: buzz .1s linear 26; }
-  @keyframes buzz { 50% { translate: .6px 0; } }
 </style>
 
 <script>
@@ -322,14 +346,15 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
     receipt.classList.add('will-print');
     // Start once the printer is about a third of the way up the screen.
     const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        receipt.classList.add('printing');
-        io.disconnect();
-      }
+      if (entries.some((e) => e.isIntersecting)) receipt.classList.add('printing');
     }, { rootMargin: '0px 0px -30% 0px' });
+    // Once the printer has scrolled completely off screen, load a fresh receipt to print next time
+    const rewind = new IntersectionObserver((entries) => {
+      if (entries.some((e) => !e.isIntersecting)) receipt.classList.remove('printing');
+    });
     // Wait until the window has finished opening (see Desktop.astro), or the printer would look
     // "on screen" while the page is still shrunk inside the opening animation and print unseen.
-    const watch = () => io.observe(receipt.previousElementSibling ?? receipt);
+    const watch = () => { io.observe(receipt.previousElementSibling ?? receipt); rewind.observe(receipt.closest('.printer') ?? receipt); };
     if (document.documentElement.dataset.winOpen) watch();
     else addEventListener('uqlit:window-open', watch, { once: true });
   }
