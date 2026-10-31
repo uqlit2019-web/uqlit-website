@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import MenuBar from '../components/MenuBar.astro';
 import Dock from '../components/Dock.astro';
-import { RUBRIC_MEMBERSHIP_URL } from '../data/site';
+import { RUBRIC_MEMBERSHIP_URL, SOCIALS } from '../data/site';
 
 export type PageKey = 'home' | 'about' | 'team' | 'events';
 
@@ -111,6 +111,13 @@ const footerLinks = [
             <div class="foot-links">
               {footerLinks.map((l) => <a href={l.href}>{l.label}</a>)}
               <a href={joinHref} class="foot-join" target="_blank" rel="noopener">Join on Rubric ↗</a>
+            </div>
+            <div class="foot-social">
+              {SOCIALS.map((s) => (
+                <a href={s.href} target="_blank" rel="noopener" aria-label={`${s.label}: ${s.handle}`} title={`${s.label} · ${s.handle}`}>
+                  <svg aria-hidden="true" viewBox="0 0 24 24" set:html={s.icon} />
+                </a>
+              ))}
             </div>
           </footer>
         </main>
@@ -498,6 +505,10 @@ const footerLinks = [
   .foot-links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-weight: 500; }
   .foot-links a:hover { color: var(--rose); }
   .foot-join { color: var(--rose); font-weight: 700; }
+  .foot-social { display: flex; gap: 14px; }
+  .foot-social a { display: flex; color: #EE929E; transition: color .2s, translate .2s; }
+  .foot-social a:hover, .foot-social a:focus-visible { color: var(--rose); translate: 0 -2px; }
+  .foot-social svg { width: 26px; height: 26px; }
 
   /* ---------- Hidden-window message ---------- */
   .hidden-msg {

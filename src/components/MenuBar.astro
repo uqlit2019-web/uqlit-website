@@ -8,12 +8,15 @@ interface Props {
 
 const { page, joinHref } = Astro.props;
 
-const links: { key: PageKey | 'sponsors'; label: string; href: string }[] = [
+const contactHref = page === 'home' || page === 'about' ? '#contact' : '/about/#contact';
+
+const links: { key: PageKey | 'sponsors' | 'contact'; label: string; href: string }[] = [
   { key: 'home', label: 'Home', href: '/' },
   { key: 'about', label: 'About', href: '/about/' },
   { key: 'team', label: 'Team', href: '/team/' },
   { key: 'events', label: 'Events', href: '/events/' },
   { key: 'sponsors', label: 'Sponsors', href: page === 'home' ? '#sponsors' : '/#sponsors' },
+  { key: 'contact', label: 'Contact', href: contactHref },
 ];
 ---
 

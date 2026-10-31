@@ -1,4 +1,5 @@
 ---
+import Contact from '../../components/Contact.astro';
 import Desktop from '../../layouts/Desktop.astro';
 import MemberCard from '../../components/MemberCard.astro';
 import { RUBRIC_MEMBERSHIP_URL } from '../../data/site';
@@ -159,6 +160,8 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
       {teaser.map((m, i) => <MemberCard member={m} size="sm" index={i} tilt={teaserTilts[i]} drop={i % 2 === 1} />)}
     </div>
   </section>
+
+  <Contact />
 
   <!-- Join -->
   <section class="join" id="join">
