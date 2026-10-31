@@ -5,6 +5,8 @@ import { t3, t6 } from '../../data/team';
 
 const t3Tilts = ['-2.5deg', '1.5deg', '-1deg'];
 const t6Tilts = ['2deg', '-2deg', '1deg'];
+// Caution tape text: two identical halves so the scroll loops seamlessly
+const tapeWords = Array.from({ length: 20 }, () => 'COMING SOON ♡');
 ---
 
 <Desktop page="team" title="Team · UQLIT" windowTitle="Meet the team">
@@ -37,6 +39,20 @@ const t6Tilts = ['2deg', '-2deg', '1deg'];
       {t6.map((m, i) => <MemberCard member={m} size="md" index={i} tilt={t6Tilts[i % 3]} drop={i === 1} />)}
     </div>
   </section>
+
+  <!-- Executive team: coming soon -->
+  <section class="execs">
+    {['t1', 't2'].map((t) => (
+      <div class={`tape ${t}`} aria-hidden="true">
+        <div class="tape-txt">{tapeWords.map((w) => <span>{w}</span>)}</div>
+      </div>
+    ))}
+    <div class="rv">
+      <div class="hand kicker">watch this space</div>
+      <h2 class="h2">The executive team</h2>
+      <p>Our 2027 executives are on their way. Come back soon ♡</p>
+    </div>
+  </section>
 </Desktop>
 
 <style>
@@ -61,4 +77,24 @@ const t6Tilts = ['2deg', '-2deg', '1deg'];
   .row { display: flex; flex-wrap: wrap; justify-content: center; }
   .t3 { gap: 40px 36px; margin-top: 40px; }
   .t6 { gap: 36px 30px; margin-top: 36px; }
+
+  .execs { position: relative; overflow: hidden; padding: clamp(110px, 12vw, 140px) var(--pad-x); text-align: center; }
+  .execs > .rv { position: relative; z-index: 1; }
+  .execs p { margin: 14px auto 0; max-width: 560px; font-size: 17px; line-height: 1.6; color: var(--muted); }
+
+  /* Pink caution tape across the section */
+  .tape {
+    position: absolute; left: -10%; width: 120%; height: 40px;
+    display: flex; align-items: center; overflow: hidden;
+    background: #F6C3CE;
+    box-shadow: 0 6px 16px rgba(120,40,70,.18);
+  }
+  .t1 { top: 34px; rotate: -2.5deg; }
+  .t2 { bottom: 34px; rotate: 2deg; }
+  .tape-txt { display: flex; flex: none; gap: 34px; padding-right: 34px; white-space: nowrap; font-size: 13px; font-weight: 800; letter-spacing: .22em; color: var(--rose); }
+  @media (prefers-reduced-motion: no-preference) {
+    .tape-txt { animation: tape-roll 40s linear infinite; }
+    .t2 .tape-txt { animation-direction: reverse; }
+    @keyframes tape-roll { to { translate: -50% 0; } }
+  }
 </style>
