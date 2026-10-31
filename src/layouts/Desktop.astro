@@ -17,10 +17,24 @@ const {
   page,
   title,
   windowTitle,
-  description = 'UQ Ladies in Technology: a supportive community for women and gender minorities in tech at UQ. Membership is $2 for the whole year.',
+  description = 'UQLIT (UQ Ladies in Technology): a supportive community for women and gender minorities in tech at UQ. Membership is $2 for the whole year.',
 } = Astro.props;
 
 const joinHref = RUBRIC_MEMBERSHIP_URL;
+// Full https:// addresses: chat apps and search engines ignore relative links for these
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og-image.jpg', Astro.site).href;
+// Tells Google that uqlit.com and our socials belong to the same society (shown on Home)
+const orgData = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'UQ Ladies in Technology',
+  alternateName: 'UQLIT',
+  url: 'https://uqlit.com/',
+  logo: new URL('/apple-touch-icon.png', Astro.site).href,
+  description: 'A supportive community for women and gender minorities in tech at the University of Queensland.',
+  sameAs: [...SOCIALS.map((s) => s.href), 'https://linktr.ee/uqlit'],
+};
 // Position of this page's tile in the dock (LIT = 0), so the window opens out of it.
 const tileIndex = { home: 0, about: 1, team: 2, events: 3 }[page];
 
@@ -47,9 +61,22 @@ const footerLinks = [
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <!-- Link previews (Instagram, Messenger, iMessage, Facebook, LinkedIn, Discord…) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="UQLIT" />
+    <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/assets/photo-team.jpg" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="UQ Ladies in Technology: the UQLIT community together at an event" />
+    <meta property="og:locale" content="en_AU" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
+    {page === 'home' && <script type="application/ld+json" set:html={JSON.stringify(orgData)} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
