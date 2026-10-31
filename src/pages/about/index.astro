@@ -288,7 +288,7 @@ const teaserTilts = ['-2.5deg', '2deg', '-1.5deg'];
   .pillar.pink p { color: #5A4A4A; }
 
   /* ---------- Team teaser ---------- */
-  .team { padding: clamp(44px, 6vw, 84px) var(--pad-x); }
+  .team { padding: clamp(44px, 6vw, 84px) var(--pad-x) clamp(8px, 1.5vw, 20px); }
   .team-grid { display: grid; grid-template-columns: minmax(0, 280px); justify-content: center; gap: 34px 26px; margin-top: 44px; align-items: start; }
   @media (min-width: 560px) { .team-grid { grid-template-columns: repeat(3, minmax(0, 280px)); } }
 
