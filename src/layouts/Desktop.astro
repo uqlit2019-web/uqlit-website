@@ -285,12 +285,18 @@ const footerLinks = [
         // Reveal cards and photos, develop photos and grow underlines as they come into view
         const reveal = new IntersectionObserver((entries) => {
           for (const e of entries) {
-            if (e.isIntersecting) {
-              e.target.classList.add('in');
-              reveal.unobserve(e.target);
-            }
+            if (e.isIntersecting) e.target.classList.add('in');
           }
         }, { rootMargin: '0px 0px -8% 0px' });
+        // Once something has scrolled completely off screen, reset it so it plays again next time
+        const rewind = new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting && e.target.classList.contains('in')) {
+              e.target.classList.remove('in');
+              pending.push(e.target as HTMLElement);
+            }
+          }
+        });
         // Handwritten notes write themselves: split each into letters that ink in one by one.
         // Screen readers get the plain text; the letters are hidden from them.
         const escHtml = (t: string) => t.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -306,18 +312,45 @@ const footerLinks = [
           el.classList.add('write');
         });
 
+        // Polaroids in the same row drop and get taped left to right: number each one by its
+        // place in its row as laid out right now, so it holds however the row wraps on this screen.
+        const orderFalls = () => {
+          const groups = new Map<Element | null, HTMLElement[]>();
+          document.querySelectorAll<HTMLElement>('.fall:not(.in)').forEach((el) => {
+            groups.set(el.parentElement, [...(groups.get(el.parentElement) ?? []), el]);
+          });
+          for (const els of groups.values()) {
+            const items = els.map((el) => ({ el, r: el.getBoundingClientRect() })).sort((a, b) => a.r.top - b.r.top);
+            let row: typeof items = [];
+            const finishRow = () => {
+              row.sort((a, b) => a.r.left - b.r.left).forEach((it, i) => it.el.style.setProperty('--d', String(i)));
+              row = [];
+            };
+            for (const it of items) {
+              // a new row starts once an item's top is below the middle of the row's first item
+              if (row.length && it.r.top > row[0].r.top + row[0].r.height / 2) finishRow();
+              row.push(it);
+            }
+            finishRow();
+          }
+        };
+        orderFalls();
+        whenWindowOpen(orderFalls); // measure again at full size
+        let orderTimer = 0;
+        addEventListener('resize', () => { clearTimeout(orderTimer); orderTimer = window.setTimeout(orderFalls, 150); });
+
         let pending = [...document.querySelectorAll<HTMLElement>('.rv, .dev, .grow, .fall, .stamp, .write')];
 
         // A fast jump (section link, End key) can skip right past an element without it ever
-        // crossing the screen, so also reveal anything that's already above the bottom of the screen.
+        // crossing the screen, so also reveal anything that's on screen when the scroll settles.
         let sweepQueued = false;
         const sweep = () => {
           sweepQueued = false;
           pending = pending.filter((el) => {
             if (el.classList.contains('in')) return false;
-            if (el.getBoundingClientRect().top < innerHeight) {
+            const r = el.getBoundingClientRect();
+            if (r.top < innerHeight && r.bottom > 0) {
               el.classList.add('in');
-              reveal.unobserve(el);
               return false;
             }
             return true;
@@ -325,7 +358,7 @@ const footerLinks = [
         };
         // Start watching only once the window is fully open (see the signal above)
         whenWindowOpen(() => {
-          pending.forEach((el) => reveal.observe(el));
+          pending.forEach((el) => { reveal.observe(el); rewind.observe(el); });
           sweep();
           addEventListener('scroll', () => { if (!sweepQueued && pending.length) { sweepQueued = true; requestAnimationFrame(sweep); } }, { passive: true });
         });
