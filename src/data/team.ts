@@ -22,7 +22,7 @@ export const t3: Member[] = [
 /** T6: the vice presidents. */
 export const t6: Member[] = [
   { name: 'Vaishnavi Ganachari', role: 'Socials VP', photo: '/assets/team/vaishnavi.jpg' },
-  { name: 'Clare Johnston', role: 'Corporate VP' },
+  { name: 'Clare Johnston', role: 'Corporate VP', photo: '/assets/team/clare.jpg' },
   { name: 'Jasmin Soon', role: 'Marketing VP' },
 ];
 
