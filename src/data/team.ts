@@ -23,7 +23,7 @@ export const t3: Member[] = [
 export const t6: Member[] = [
   { name: 'Vaishnavi Ganachari', role: 'Socials VP', photo: '/assets/team/vaishnavi.jpg' },
   { name: 'Clare Johnston', role: 'Corporate VP', photo: '/assets/team/clare.jpg' },
-  { name: 'Jasmin Soon', role: 'Marketing VP' },
+  { name: 'Jasmin Soon', role: 'Marketing VP', photo: '/assets/team/jasmin.jpg' },
 ];
 
 /** Executive team, grouped into portfolios. */
