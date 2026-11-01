@@ -133,7 +133,7 @@ const footerLinks = [
           <footer class="foot">
             <div class="foot-brand">
               <img src="/assets/logo-lit.png" alt="" width="42" height="42" />
-              <span><strong>UQ Ladies in Technology</strong><br />© {new Date().getFullYear()} UQLIT</span>
+              <strong>UQ Ladies in Technology</strong>
             </div>
             <div class="foot-links">
               {footerLinks.map((l) => <a href={l.href}>{l.label}</a>)}
@@ -145,6 +145,10 @@ const footerLinks = [
                   <svg aria-hidden="true" viewBox="0 0 24 24" set:html={s.icon} />
                 </a>
               ))}
+            </div>
+            <div class="foot-base">
+              <span>© 2027 UQLIT</span>
+              <span>This website was created and designed by Ellie Feng</span>
             </div>
           </footer>
         </main>
@@ -569,6 +573,12 @@ const footerLinks = [
   .foot-social a { display: flex; color: #EE929E; transition: color .2s, translate .2s; }
   .foot-social a:hover, .foot-social a:focus-visible { color: var(--rose); translate: 0 -2px; }
   .foot-social svg { width: 26px; height: 26px; }
+  .foot-base {
+    flex-basis: 100%;
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px;
+    padding-top: 16px; border-top: 1px solid rgba(120,106,106,.14);
+    font-size: 12.5px;
+  }
 
   /* ---------- Hidden-window message ---------- */
   .hidden-msg {
