@@ -12,6 +12,8 @@
 //  image:     optional photo, a file in public/assets/events/ (keep it under ~1600px wide)
 // ─────────────────────────────────────────────────────────────
 
+import { RUBRIC_EVENTS_URL } from './site';
+
 export interface UqlitEvent {
   title: string;
   date: string;
@@ -112,7 +114,10 @@ export const events: UqlitEvent[] = [
 
 // ---- helpers (no need to edit) ----
 
-const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
+// Every event links to Rubric: its own page if given, otherwise our Rubric events list.
+const sorted = [...events]
+  .map((e) => ({ ...e, rubricUrl: e.rubricUrl ?? RUBRIC_EVENTS_URL }))
+  .sort((a, b) => a.date.localeCompare(b.date));
 
 export function todayInBrisbane(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Brisbane' }).format(new Date());
