@@ -4,7 +4,8 @@ import EventCard from '../components/EventCard.astro';
 import JoinBand from '../components/JoinBand.astro';
 import Contact from '../components/Contact.astro';
 import Sponsors from '../components/Sponsors.astro';
-import { upcomingEvents } from '../data/events';
+import { upcomingEvents, todayInBrisbane } from '../data/events';
+import { jobs } from '../data/jobs';
 import { RUBRIC_MEMBERSHIP_URL, RUBRIC_EVENTS_URL } from '../data/site';
 
 // Typing headline: each character is its own span so it can type in one by one.
@@ -42,6 +43,12 @@ const photos = [
 
 // A few extra so the page can drop ones that pass between rebuilds (see script below).
 const upcoming = upcomingEvents().slice(0, 6);
+// Open sponsor roles, soonest deadline first (the script below drops any that close between rebuilds)
+const openJobs = jobs.filter((j) => j.due >= todayInBrisbane()).sort((a, b) => a.due.localeCompare(b.due)).slice(0, 6);
+const jobTilts = ['-1.5deg', '1.5deg', '-1deg'];
+const jobPins = ['rose', 'gold', 'teal'];
+const shortDate = (iso: string) =>
+  new Intl.DateTimeFormat('en-AU', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
 const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.4-11-11C9.2 10.4 11.4 6.2 12 1z';
 ---
 
@@ -169,6 +176,33 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
     </p>
   </section>
 
+  <!-- Job Hub preview: open roles from sponsors -->
+  <section id="jobs" class="jobs">
+    <div class="rv up-head">
+      <div>
+        <div class="hand kicker">hiring now</div>
+        <h2 class="h2">Job Hub</h2>
+      </div>
+      <a class="btn btn-outline small" href="/jobs/">All jobs →</a>
+    </div>
+    <div class="job-row" id="home-jobs">
+      {openJobs.map((j, i) => (
+        <a class:list={['job', 'fall', `pin-${jobPins[i % 3]}`]} href={`/jobs/#${j.id}`} data-due={j.due} style={`--d: ${i % 3}; rotate: ${jobTilts[i % 3]}`}>
+          <span class="pin" aria-hidden="true"></span>
+          <span class="job-art">
+            {j.graphic ? <img src={j.graphic} alt="" loading="lazy" /> : <span class="job-ph"><img src={j.logo} alt="" /></span>}
+          </span>
+          <span class="job-who">{j.company}</span>
+          <strong class="job-title">{j.title}</strong>
+          <span class="job-due">Closes {shortDate(j.due)}<span class="job-left" data-left></span></span>
+        </a>
+      ))}
+    </div>
+    <p class="empty hand" id="home-jobs-empty" hidden={openJobs.length > 0}>
+      no open roles right now. new ones get pinned to the <a href="/jobs/">Job Hub</a> as sponsors send them ♡
+    </p>
+  </section>
+
   <Contact />
   <JoinBand />
 </Desktop>
@@ -240,6 +274,22 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
       card.hidden = !keep;
     });
     document.getElementById('home-events-empty')!.hidden = shown > 0;
+  }
+
+  // Same for open roles: drop any that have closed, show at most three, and count down the days left.
+  const jobList = document.getElementById('home-jobs');
+  if (jobList) {
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Brisbane' }).format(new Date());
+    let shown = 0;
+    jobList.querySelectorAll<HTMLElement>('[data-due]').forEach((card) => {
+      const left = Math.round((Date.parse(`${card.dataset.due}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 864e5);
+      const keep = left >= 0 && shown < 3;
+      if (keep) shown++;
+      card.hidden = !keep;
+      card.classList.toggle('soon', left <= 7);
+      card.querySelector('[data-left]')!.textContent = left === 0 ? 'last day!' : left === 1 ? '1 day left' : `${left} days left`;
+    });
+    document.getElementById('home-jobs-empty')!.hidden = shown > 0;
   }
 </script>
 
@@ -349,6 +399,38 @@ const sparkle = 'M12 1c.6 5.2 2.8 9.4 11 11-8.2 1.6-10.4 5.8-11 11-.6-5.2-2.8-9.
   .empty { margin: 36px 0 0; font-size: 21px; font-weight: 400; color: var(--muted); }
   .empty a { color: var(--rose); text-decoration: underline; }
   .empty[hidden] { display: none; }
+
+  /* ---------- Open roles ---------- */
+  .jobs { padding: clamp(40px, 6vw, 80px) var(--pad-x); scroll-margin-top: 40px; }
+  .job-row { display: flex; flex-wrap: wrap; gap: 40px 32px; margin-top: 48px; }
+  .job {
+    position: relative; flex: 1 1 240px; max-width: 320px;
+    display: flex; flex-direction: column; gap: 4px;
+    background: #fff; padding: 12px 12px 16px; border-radius: 6px;
+    box-shadow: 0 8px 22px rgba(150,60,85,.14);
+    transition: rotate .35s cubic-bezier(.2,.9,.3,1.3), scale .35s cubic-bezier(.2,.9,.3,1.3), box-shadow .35s;
+  }
+  .job:hover, .job:focus-visible { rotate: 0deg !important; scale: 1.04; box-shadow: 0 16px 36px rgba(150,60,85,.2); }
+  .job[hidden] { display: none; }
+  .pin {
+    position: absolute; top: -9px; left: 50%; z-index: 2;
+    width: 22px; height: 22px; margin-left: -11px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0 12%, var(--pc) 32%, var(--pd) 100%);
+    box-shadow: 0 3px 5px rgba(120,40,70,.3);
+  }
+  .pin-rose { --pc: #E58BA1; --pd: #B8405F; }
+  .pin-gold { --pc: #F7CF6E; --pd: #C98F14; }
+  .pin-teal { --pc: #7FD3C5; --pd: #2E8C7E; }
+  .job-art { display: block; height: 200px; margin-bottom: 10px; overflow: hidden; background: var(--blush-3); }
+  .job-art > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .job-ph { height: 100%; display: flex; align-items: center; justify-content: center; }
+  .job-ph img { width: 90px; height: 90px; object-fit: contain; padding: 12px; border-radius: 50%; background: #fff; }
+  .job-who { padding: 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--rose); }
+  .job-title { padding: 0 4px; font-size: 17px; line-height: 1.3; }
+  .job-due { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding: 12px 4px 0; font-size: 13px; color: var(--muted); }
+  .job-left { padding: 3px 10px; border-radius: 999px; background: var(--blush-3); color: #8E2F48; font-weight: 700; font-size: 12px; white-space: nowrap; }
+  .soon .job-left { background: var(--rose); color: #fff; }
+  .job-title + .job-due { margin-top: auto; }
 
   /* ---------- Motion ---------- */
   @media (prefers-reduced-motion: no-preference) {
