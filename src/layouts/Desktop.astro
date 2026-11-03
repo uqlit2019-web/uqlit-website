@@ -4,7 +4,7 @@ import MenuBar from '../components/MenuBar.astro';
 import Dock from '../components/Dock.astro';
 import { RUBRIC_MEMBERSHIP_URL, SOCIALS } from '../data/site';
 
-export type PageKey = 'home' | 'about' | 'team' | 'events';
+export type PageKey = 'home' | 'about' | 'team' | 'events' | 'jobs';
 
 interface Props {
   page: PageKey;
@@ -36,7 +36,7 @@ const orgData = {
   sameAs: [...SOCIALS.map((s) => s.href), 'https://linktr.ee/uqlit'],
 };
 // Position of this page's tile in the dock (LIT = 0), so the window opens out of it.
-const tileIndex = { home: 0, about: 1, team: 2, events: 3 }[page];
+const tileIndex = { home: 0, about: 1, team: 2, events: 3, jobs: 4 }[page];
 
 // Footer links: every page except the one you're on, then Sponsors.
 const footerLinks = [
@@ -44,6 +44,7 @@ const footerLinks = [
   { key: 'about', label: 'About', href: '/about/' },
   { key: 'team', label: 'Team', href: '/team/' },
   { key: 'events', label: 'Events', href: '/events/' },
+  { key: 'jobs', label: 'Jobs', href: '/jobs/' },
 ]
   .filter((l) => l.key !== page)
   .concat({ key: 'sponsors', label: 'Sponsors', href: page === 'home' ? '#sponsors' : '/#sponsors' });
@@ -478,8 +479,8 @@ const footerLinks = [
     display: flex;
     flex-direction: column;
     /* Horizontal offset of this page's dock tile from the screen centre.
-       Dock row = 6 tiles + 6 gaps + 1px separator. */
-    --dock-w: calc(6 * var(--tile) + 6 * var(--gap) + 1px);
+       Dock row = 7 tiles + 7 gaps + 1px separator. */
+    --dock-w: calc(7 * var(--tile) + 7 * var(--gap) + 1px);
     --tile-x: calc(var(--tile) / 2 - var(--dock-w) / 2 + var(--tile-i) * (var(--tile) + var(--gap)));
   }
 
